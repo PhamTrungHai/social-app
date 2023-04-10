@@ -3,17 +3,17 @@
 Basically it's my take on cloning one of the biggest platform for past decades FACEBOOK. It has or will have all the basic function facebook has like *add friend, post, story, chat,..* The difference is that i'll implement openAI API to try and replicate some of the current popular AI like **chatGPT, DALL·E 2,midjourney,...** 
 ## Features
 1. Basic Facebook 
-  - Real-time chat
-  - Posting, interacting with post
-  - Add/delete friend
-  - Real-time notification.
-  - Profile edit(name, avatar, background, url)
+  _Real-time chat
+  _Posting, interacting with post
+  _Add/delete friend
+  _Real-time notification.
+  _Profile edit(name, avatar, background, url)
 2.AI add-ons
-  - AI chat bot.
-  - Image generate with prompt.
+  _AI chat bot.
+  _Image generate with prompt.
 3. Advanced features
-  - Profile wall decorating.
-  - Video call
+  _Profile wall decorating.
+  _Video call
 ## How to use
 1. Clone this repository url:***https://github.com/PhamTrungHai/social-app.git***
 2. Open terminal from the root of the project navigate to the *backend* folder with `cd backend` then run `npm i` to install all dependencies.
@@ -37,6 +37,6 @@ Basically it's my take on cloning one of the biggest platform for past decades F
   + *Framework*: Vite + Reactjs
   + *Library*: redux, axios, swr, socket.io-client
   + *Styling*: CharkaUI,animate.css,react-toastify
- **I'm still learning so i'm open to constructive criticsm.** :smiling_face_with_tear: 
- **If you have any problem or wanting to collaborate, feel free to contact me on [my facebook] (https://www.facebook.com/trhai256).** :smile: :smile: :smile:
- ***Thank for viewing my project.*** :heart: :heart: :heart:  
+**I'm still learning so i'm open to constructive criticsm.** :smiling_face_with_tear: 
+**If you have any problem or wanting to collaborate, feel free to contact me on [my facebook] (https://www.facebook.com/trhai256).** :smile: :smile: :smile:
+***Thank for viewing my project.*** :heart: :heart: :heart:  
