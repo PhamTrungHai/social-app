@@ -30,12 +30,13 @@ Basically it's my take on cloning one of the biggest platform for past decades F
 6. Now to run it use `npm run dev` and your client side code should be running.
 ## Technologies
 - **Backend**
-  + * Server*: Nodejs + Express,SocketIO
-  + * Database*: MongGoDB,PostGres,Prisma
-  + * Other*: Cloudinary, multer,bcryptjs,...
+  + *Server*: Nodejs + Express,SocketIO
+  + *Database*: MongGoDB,PostGres,Prisma
+  + *Other*: Cloudinary, multer,bcryptjs,...
 - **Frontend**
   + *Framework*: Vite + Reactjs
   + *Library*: redux, axios, swr, socket.io-client
   + *Styling*: CharkaUI,animate.css,react-toastify
- ***I'm still learning so i'm open to constructive criticsm :smiling_face_with_tear: . If you have any problem or wanting to collaborate, feel free to contact me on [my facebook] (https://www.facebook.com/trhai256). :smile: :smile: :smile:
+ **I'm still learning so i'm open to constructive criticsm.** :smiling_face_with_tear: 
+ **If you have any problem or wanting to collaborate, feel free to contact me on [my facebook] (https://www.facebook.com/trhai256).** :smile: :smile: :smile:
  ***Thank for viewing my project.*** :heart: :heart: :heart:  
