@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FriendList {
+  id      BigInt    @id @default(autoincrement())
+  userID  String    @unique(map: "FriendList_UserID_key")
+  users   Users     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  friends Friends[]
+}
+
+model Friends {
+  id           BigInt       @id @default(autoincrement())
+  listID       BigInt
+  userID       String
+  status       String
+  friendList   FriendList   @relation(fields: [listID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  SocialStatus SocialStatus @relation(fields: [status], references: [name], onDelete: Cascade, onUpdate: NoAction)
+  users        Users        @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Users {
+  id           String         @id @default("")
+  friendList   FriendList?
+  friends      Friends[]
+  notification Notification[]
+}
+
+model Notification {
+  id     BigInt @id @default(autoincrement())
+  userID String
+  type   String
+  data   Json   @db.Json
+  users  Users  @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SocialStatus {
+  name    String    @id
+  Friends Friends[]
+}
