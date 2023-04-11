@@ -13,19 +13,24 @@ function MainPage() {
   const { userInfo } = useSelector((state) => state.user);
 
   useEffect(() => {
+    const sessionID = localStorage.getItem('sessionID');
     const newSocket = io(`http://${window.location.hostname}:5000`, {
       autoConnect: false,
     });
-    newSocket.auth = { userId: userInfo._id };
-    newSocket.connect();
-
-    socket.on('session', ({ sessionID, userID }) => {
+    if (sessionID) {
+      newSocket.auth = { sessionID };
+      newSocket.connect();
+    } else {
+      newSocket.auth = { userId: userInfo._id, userName: userInfo.name };
+      newSocket.connect();
+    }
+    newSocket.on('session', ({ sessionID, userId }) => {
       // attach the session ID to the next reconnection attempts
-      socket.auth = { sessionID };
+      newSocket.auth = { sessionID };
       // store it in the localStorage
       localStorage.setItem('sessionID', sessionID);
       // save the ID of the user
-      socket.userID = userID;
+      newSocket.userId = userId;
     });
     setSocket(newSocket);
     return () => newSocket.close();

@@ -13,7 +13,6 @@ const getUserNotification = async (userId) => {
 };
 
 const registerNotificationHandlers = (io, socket) => {
-  console.log(socket.userId);
   const readNotification = async (userId) => {
     const notiList = await getUserNotification(userId);
     io.emit('notify:read', notiList);

@@ -43,3 +43,10 @@ model SocialStatus {
   name    String    @id
   Friends Friends[]
 }
+
+model SessionStore {
+  sessionID String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String  @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userName  String
+  connected Boolean
+}

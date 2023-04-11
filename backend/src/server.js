@@ -8,8 +8,12 @@ import userRouter from './routes/userRouter.js';
 import uploadRouter from './routes/uploadRouter.js';
 import socialRouter from './routes/socialRouter.js';
 import registerNotificationHandlers from '../socketio/notificationHandler.js';
+import crypto from 'crypto';
+import { InMemorySessionStore } from '../socketio/sessionStore.js';
 
 dotenv.config();
+const randomId = () => crypto.randomBytes(8).toString('hex');
+const sessionStore = new InMemorySessionStore();
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -29,12 +33,12 @@ io.use((socket, next) => {
     const session = sessionStore.findSession(sessionID);
     if (session) {
       socket.sessionID = sessionID;
-      socket.userID = session.userID;
-      socket.username = session.username;
+      socket.userId = session.userId;
+      socket.userName = session.userName;
       return next();
     }
   }
-  const username = socket.handshake.auth.username;
+  const username = socket.handshake.auth.userName;
   if (!username) {
     return next(new Error('invalid username'));
   }
@@ -44,26 +48,51 @@ io.use((socket, next) => {
   }
   // create new session
   socket.userId = userId;
-  socket.sessionID = userId;
-  socket.userID = userId;
-  socket.username = username;
+  socket.sessionID = randomId();
+  socket.userName = username;
   next();
 });
 const onConnection = (socket) => {
+  // persist session
+  sessionStore.saveSession(socket.sessionID, {
+    userId: socket.userId,
+    userName: socket.userName,
+    connected: true,
+  });
   const users = [];
-  for (let [id, socket] of io.of('/').sockets) {
+  sessionStore.findAllSessions().forEach((session) => {
     users.push({
-      socketId: id,
-      userId: socket.userId,
+      userId: session.userId,
+      userName: session.userName,
+      connected: session.connected,
     });
-  }
+  });
+  // send session details
   socket.emit('session', {
     sessionID: socket.sessionID,
-    userID: socket.userID,
+    userId: socket.userID,
   });
+  // join the "userID" room
+  socket.join(socket.userId);
+
   socket.emit('users', users);
   registerNotificationHandlers(io, socket);
   // registerUserHandlers(io, socket);
+  socket.on('disconnect', async () => {
+    const matchingSockets = await io.in(socket.userId).fetchSockets();
+    const isDisconnected = matchingSockets.length === 0;
+    console.log(isDisconnected);
+    if (isDisconnected) {
+      // notify other users
+      socket.broadcast.emit('user disconnected', socket.userID);
+      // update the connection status of the session
+      sessionStore.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        username: socket.username,
+        connected: false,
+      });
+    }
+  });
 };
 
 io.on('connection', onConnection);

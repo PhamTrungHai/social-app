@@ -6,12 +6,14 @@ const User = prisma.users;
 const FriendList = prisma.friendList;
 const Friends = prisma.friends;
 const Notification = prisma.notification;
+const SessionStore = prisma.sessionStore;
 export const Models = {
   User,
   FriendList,
   Friends,
   Notification,
   prisma,
+  SessionStore,
 };
 // function Execute(...funcs) {
 //   for (const func of funcs) {

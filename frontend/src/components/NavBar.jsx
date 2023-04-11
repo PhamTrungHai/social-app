@@ -88,7 +88,7 @@ export default function NavBar({ socket }) {
             <MenuGroup title="Mới" fontSize={17}>
               {notify ? (
                 [...notify].map((notifie) => (
-                  <MenuItem key={notifie.data.sender}>
+                  <MenuItem key={notifie.data.payload}>
                     <Flex w={'full'} flexWrap={'wrap'}>
                       <Box>
                         <Avatar>
