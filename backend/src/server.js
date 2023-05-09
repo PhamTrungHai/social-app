@@ -9,11 +9,11 @@ import uploadRouter from './routes/uploadRouter.js';
 import socialRouter from './routes/socialRouter.js';
 import registerNotificationHandlers from '../socketio/notificationHandler.js';
 import crypto from 'crypto';
-import { InMemorySessionStore } from '../socketio/sessionStore.js';
+import { Models } from './models/prismaDB.js';
 
 dotenv.config();
 const randomId = () => crypto.randomBytes(8).toString('hex');
-const sessionStore = new InMemorySessionStore();
+const SessionStore = Models.SessionStore;
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -26,11 +26,15 @@ const io = new Server(httpServer, {
 });
 // Socket.IO
 
-io.use((socket, next) => {
+//Middleware
+io.use(async (socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
   if (sessionID) {
     // find existing session
-    const session = sessionStore.findSession(sessionID);
+    const session = await SessionStore.findUnique({
+      where: { sessionID: sessionID },
+    });
+
     if (session) {
       socket.sessionID = sessionID;
       socket.userId = session.userId;
@@ -52,44 +56,57 @@ io.use((socket, next) => {
   socket.userName = username;
   next();
 });
-const onConnection = (socket) => {
+const onConnection = async (socket) => {
   // persist session
-  sessionStore.saveSession(socket.sessionID, {
-    userId: socket.userId,
-    userName: socket.userName,
-    connected: true,
+  await SessionStore.upsert({
+    update: {
+      connected: true,
+      sessionID: socket.sessionID,
+    },
+    where: { userId: socket.userId },
+    create: {
+      sessionID: socket.sessionID,
+      userId: socket.userId,
+      userName: socket.userName,
+      connected: true,
+    },
   });
-  const users = [];
-  sessionStore.findAllSessions().forEach((session) => {
-    users.push({
-      userId: session.userId,
-      userName: session.userName,
-      connected: session.connected,
-    });
-  });
+  // const users = [];
+  // SessionStore.findMany().forEach((session) => {
+  //   users.push({
+  //     userId: session.userId,
+  //     userName: session.userName,
+  //     connected: session.connected,
+  //   });
+  // });
   // send session details
   socket.emit('session', {
     sessionID: socket.sessionID,
     userId: socket.userID,
   });
   // join the "userID" room
+
   socket.join(socket.userId);
 
-  socket.emit('users', users);
+  // send active user
+  // socket.emit('users', users);
+
   registerNotificationHandlers(io, socket);
   // registerUserHandlers(io, socket);
   socket.on('disconnect', async () => {
     const matchingSockets = await io.in(socket.userId).fetchSockets();
+    console.log('matchingSockets', matchingSockets.length);
     const isDisconnected = matchingSockets.length === 0;
-    console.log(isDisconnected);
+    console.log('isDisconnected', isDisconnected);
     if (isDisconnected) {
       // notify other users
       socket.broadcast.emit('user disconnected', socket.userID);
       // update the connection status of the session
-      sessionStore.saveSession(socket.sessionID, {
-        userID: socket.userID,
-        username: socket.username,
-        connected: false,
+      await SessionStore.update({
+        data: {
+          connected: false,
+        },
+        where: { userId: socket.userId },
       });
     }
   });

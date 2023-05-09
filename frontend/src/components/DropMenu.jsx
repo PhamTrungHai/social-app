@@ -26,6 +26,7 @@ function DropMenu() {
   const signoutHandler = () => {
     dispatch(userSignOut());
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('sessionID');
     window.location.href = '/login';
   };
   return (

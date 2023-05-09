@@ -5,9 +5,15 @@ import * as SocialController from '../controllers/SocialController.js';
 const socialRouter = express.Router();
 
 socialRouter.get('/:id', SocialController.getFriendStatus);
-socialRouter.put('/:id', isAuth, SocialController.requestFriend);
+socialRouter.get('/notify/:id', SocialController.getUserNotification);
+socialRouter.post('/:id', isAuth, SocialController.requestFriend);
+socialRouter.patch(
+  '/notify/:id',
+  isAuth,
+  SocialController.updateNotificationStatus
+);
 socialRouter.put(
-  '/:id/response/:reply',
+  '/response/:id',
   isAuth,
   SocialController.friendRequestHandler
 );

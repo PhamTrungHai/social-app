@@ -46,7 +46,7 @@ function SignIn() {
       localStorage.setItem('userInfo', JSON.stringify(data));
       navigate(redirect || '/');
     } catch (err) {
-      toast.error(getErrorr(err), {
+      toast.error(err, {
         position: 'top-center',
         autoClose: 4000,
         hideProgressBar: false,

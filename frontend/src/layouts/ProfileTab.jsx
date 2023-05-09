@@ -19,8 +19,8 @@ import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { BsMessenger } from 'react-icons/bs';
 import { IoPersonAdd } from 'react-icons/io5';
 import { MdBuild } from 'react-icons/md';
-import UserAvatar from '../components/UserAvatar';
 import '../styles/ProfileTab.css';
+import UserAvatar from '../components/UserAvatar';
 import UserInfo from '../components/UserInfo';
 import UserCover from '../components/UserCover';
 
@@ -30,8 +30,9 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { convertTime, getCurrentTime } from '../utils/dateUtil.js';
 
-function ProfileTab() {
+function ProfileTab({ socket }) {
   const params = useParams();
   const { id: userId } = params;
   const navigate = useNavigate();
@@ -68,12 +69,14 @@ function ProfileTab() {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.put(
+      const dateStr = getCurrentTime();
+      const { data } = await axios.post(
         `/api/social/${userId}`,
         {
           _id: userInfo._id,
           type: 'FRIEND-REQUEST',
           payload: `${userInfo._id} want to add friend`,
+          date: dateStr,
         },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
@@ -81,18 +84,22 @@ function ProfileTab() {
       );
       setIsFriend(data.state);
       toast.success(data.message);
+      socket.emit('notify:create', curUser._id, 'FRIEND-REQUESTED', dateStr);
     } catch (err) {
       toast.error(getError(err));
     }
   };
   const requestHandler = async (choice, type) => {
     try {
+      const dateStr = getCurrentTime();
       const { data } = await axios.put(
-        `/api/social/${userId}/response/${choice}`,
+        `/api/social/response/${userId}`,
         {
           _id: userInfo._id,
           type: type,
           payload: `${choice} ${userId} friend request`,
+          reply: choice,
+          date: dateStr,
         },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },

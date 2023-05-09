@@ -32,11 +32,13 @@ model Users {
 }
 
 model Notification {
-  id     BigInt @id @default(autoincrement())
-  userID String
-  type   String
-  data   Json   @db.Json
-  users  Users  @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id       Int      @id @default(autoincrement())
+  userID   String
+  type     String
+  data     Json     @db.Json
+  date     DateTime @db.Timestamptz(6)
+  isViewed Boolean  @default(false)
+  users    Users    @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model SocialStatus {
@@ -45,8 +47,8 @@ model SocialStatus {
 }
 
 model SessionStore {
-  sessionID String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId    String  @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  sessionID String  @id
+  userId    String  @unique
   userName  String
   connected Boolean
 }

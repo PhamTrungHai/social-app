@@ -37,7 +37,7 @@ function MainPage() {
   }, [setSocket, userInfo._id]);
   return (
     <Grid
-      templateRows="80px 87vh"
+      templateRows="80px 90vh"
       templateColumns="repeat(8, 1fr)"
       bg={'whatsapp.400'}
     >
@@ -50,7 +50,7 @@ function MainPage() {
             path="/"
             element={
               <ProtectedRoute>
-                <HomeTab />
+                <HomeTab socket={socket} />
               </ProtectedRoute>
             }
           />
@@ -58,7 +58,7 @@ function MainPage() {
             path="/:id"
             element={
               <ProtectedRoute>
-                <ProfileTab />
+                <ProfileTab socket={socket} />
               </ProtectedRoute>
             }
           />

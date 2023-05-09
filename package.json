@@ -1,0 +1,14 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "description": "Basically it's my take on cloning one of the biggest platform for past decades FACEBOOK. It has or will have all the basic function facebook has like *add friend, post, story, chat,..* The difference is that i'll implement openAI API to try and replicate some of the current popular AI like **chatGPT, DALL·E 2,midjourney,...** \r ## Features\r 1. Basic Facebook \r   _Real-time chat\r   _Posting, interacting with post\r   _Add/delete friend\r   _Real-time notification.\r   _Profile edit(name, avatar, background, url)\r 2.AI add-ons\r   _AI chat bot.\r   _Image generate with prompt.\r 3. Advanced features\r   _Profile wall decorating.\r   _Video call\r ## How to use\r 1. Clone this repository url:***https://github.com/PhamTrungHai/social-app.git***\r 2. Open terminal from the root of the project navigate to the *backend* folder with `cd backend` then run `npm i` to install all dependencies.\r 3. Create a .env file then add all the evironment varible. The list are:\r   -JWT_SECRET\r   -MONGODB_URI\r   -CLOUDINARY_CLOUD_NAME\r   -CLOUDINARY_API_KEY\r   -CLOUDINARY_API_SECRET\r   -DATABASE_URL\r 4.After that try running the app with `npm start` and you're application's server side should be ready to go.\r 5. Now countinue with the *frontend*, repeat step 2 but replace *backend* with *frontend*. \r **Note: You have to be in the root of the project in order to navigate to frontend folder. I suggest open another terminal for running frontend to reduce the time from navigating through backend and frontend**\r 6. Now to run it use `npm run dev` and your client side code should be running.\r ## Technologies\r - **Backend**\r   + *Server*: Nodejs + Express,SocketIO\r   + *Database*: MongGoDB,PostGres,Prisma\r   + *Other*: Cloudinary, multer,bcryptjs,...\r - **Frontend**\r   + *Framework*: Vite + Reactjs\r   + *Library*: redux, axios, swr, socket.io-client\r   + *Styling*: CharkaUI,animate.css,react-toastify\r **I'm still learning so i'm open to constructive criticsm.** :smiling_face_with_tear: \r **If you have any problem or wanting to collaborate, feel free to contact me on [my facebook] (https://www.facebook.com/trhai256).** :smile: :smile: :smile:\r ***Thank for viewing my project.*** :heart: :heart: :heart:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-be": "cd backend && npm start ",
+    "dev-fe": "cd frontend && npm run dev",
+    "db-pull": "cd backend && npx prisma db pull"
+  },
+  "author": "",
+  "license": "ISC"
+}

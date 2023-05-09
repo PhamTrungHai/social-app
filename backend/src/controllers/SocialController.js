@@ -19,6 +19,21 @@ const getFriendListID = async (userId) => {
   return friendList.id;
 };
 
+const getUserNotification = expressAsyncHandler(async (req, res) => {
+  const notiList = await Models.Notification.findMany({
+    where: { userID: req.params.id },
+    select: {
+      id: true,
+      type: true,
+      data: true,
+      users: true,
+      date: true,
+      isViewed: true,
+    },
+  });
+  res.send(notiList);
+});
+
 const getFriendStatus = expressAsyncHandler(async (req, res) => {
   const user = await UserController.findUser(req.params.id);
   const listID = await getFriendListID(user.id);
@@ -82,11 +97,21 @@ const deleteFriendStatus = async (sendID, receiveID) => {
   return 'not';
 };
 
-const notifyUser = async (reqUser, recUser, type, payload) => {
+const createNotification = async (reqUser, recUser, type, payload, date) => {
+  const newDate = new Date(date);
+  const user = await User.findById(reqUser);
   await Models.Notification.create({
     data: {
       type: type,
-      data: { sender: reqUser, payload: payload },
+      data: {
+        sender: {
+          id: user.id,
+          name: user.name,
+          avatar: user.profile.avatarURL,
+        },
+        payload: payload,
+      },
+      date: newDate,
       users: {
         connect: {
           id: recUser,
@@ -96,46 +121,60 @@ const notifyUser = async (reqUser, recUser, type, payload) => {
   });
 };
 
+const updateNotification = async (reqUser, type, date) => {
+  date = new Date(date).toISOString();
+  await Models.prisma
+    .$queryRaw`UPDATE "Notification" SET "type" = ${type} , "date" = ${date}::timestamptz WHERE "userID" = ${reqUser};`;
+};
+
 const friendRequestHandler = expressAsyncHandler(async (req, res) => {
   const user = await UserController.findUser(req.params.id);
   const responseUser = req.body._id;
+  const date = req.body.date;
   const receiveUser = user.id;
+  const reply = req.body.reply;
   var friendStatus = 'not';
   var msg;
-  var type;
+  var type = req.body.type;
   const flag = await isFriend(receiveUser, responseUser);
 
   if (user) {
-    if (req.params.reply == 'accept') {
+    if (reply == 'accept') {
       if (flag == 'requesting') {
         await changeFriendStatus(responseUser, receiveUser, 'friend');
         await changeFriendStatus(receiveUser, responseUser, 'friend');
         friendStatus = 'friend';
         msg = 'Friend Request Accepted! You are now friend';
-        type = notificationType.FRIEND_ADD;
+        type = notificationType.FRIEND_ACCEPTED;
+        updateNotification(responseUser, notificationType.FRIEND_ADDED, date);
       } else {
         res.send({
-          message: `You're friend have withdraw request`,
+          message: `Your friend have withdraw request`,
           status: friendStatus,
         });
         return;
       }
     }
-    if (req.params.reply == 'decline') {
+    if (reply == 'decline') {
       await deleteFriendStatus(responseUser, receiveUser);
       msg = 'You have decline request!';
-      type = notificationType.FRIEND_DELETE;
+      type = notificationType.FRIEND_DELETED;
     }
-    if (req.params.reply == 'cancel') {
+    if (reply == 'cancel') {
       await deleteFriendStatus(responseUser, receiveUser);
       if (flag == 'requested') {
         await deleteFriendStatus(receiveUser, responseUser);
       }
       msg = 'You have cancel request!';
-      type = notificationType.FRIEND_DELETE;
+      type = notificationType.FRIEND_DELETED;
     }
-    await notifyUser(responseUser, receiveUser, type, req.body.payload);
-    console.log(friendStatus);
+    await createNotification(
+      responseUser,
+      receiveUser,
+      type,
+      req.body.payload,
+      date
+    );
     res.send({
       message: msg,
       status: friendStatus,
@@ -147,16 +186,34 @@ const requestFriend = expressAsyncHandler(async (req, res) => {
   const user = await UserController.findUser(req.params.id);
   const requestUser = req.body._id;
   const receiveUser = user.id;
+  const date = new Date(req.body.date);
 
   if (user) {
     await addToFriendList(requestUser, receiveUser, SocialStatus.requesting);
     await addToFriendList(receiveUser, requestUser, SocialStatus.requested);
-    await notifyUser(requestUser, receiveUser, req.body.type, req.body.payload);
+    await createNotification(
+      requestUser,
+      receiveUser,
+      req.body.type,
+      req.body.payload,
+      date
+    );
 
     res.send({ message: 'Invite Sent', state: 'requesting' });
   } else {
     res.status(404).send({ message: 'User Not Found' });
   }
+});
+
+const updateNotificationStatus = expressAsyncHandler(async (req, res) => {
+  const NotificationArray = req.body.notifyArray;
+  await NotificationArray.forEach(async (item) => {
+    await Models.Notification.update({
+      where: { id: item.id },
+      data: { isViewed: true },
+    });
+  });
+  res.send({ message: 'No new notifications' });
 });
 
 export {
@@ -165,4 +222,6 @@ export {
   isFriend,
   friendRequestHandler,
   getFriendStatus,
+  getUserNotification,
+  updateNotificationStatus,
 };

@@ -1,23 +1,32 @@
 import { Models } from '../src/models/prismaDB.js';
+import User from '../src/models/User.js';
 
-const getUserNotification = async (userId) => {
-  const notiList = await Models.Notification.findMany({
-    where: { userID: userId },
-    select: {
-      type: true,
-      data: true,
-      users: true,
-    },
-  });
-  return notiList;
+const getUserInfo = async (userId) => {
+  const UserInfo = await User.findById(userId);
+  return UserInfo;
 };
 
 const registerNotificationHandlers = (io, socket) => {
-  const readNotification = async (userId) => {
-    const notiList = await getUserNotification(userId);
-    io.emit('notify:read', notiList);
+  // const readNotification = async (userId) => {
+  //   const notiList = await getUserNotification(userId);
+  //   io.emit('notify:read', notiList);
+  // };
+  const createNotification = async (userId, type, date) => {
+    const user = await getUserInfo(socket.userId);
+    io.to(userId).emit(
+      'notify:receive',
+      {
+        id: user.id,
+        name: user.name,
+        avatar: user.profile.avatarURL,
+      },
+      type,
+      date
+    );
   };
-  socket.on('notify:read', readNotification);
+
+  // socket.on('notify:read', readNotification);
+  socket.on('notify:create', createNotification);
 };
 
 export default registerNotificationHandlers;
