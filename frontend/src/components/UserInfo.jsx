@@ -1,35 +1,19 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import useSWR from 'swr';
-import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import {
-  Grid,
-  GridItem,
-  Container,
-  Box,
-  VStack,
-  Flex,
-  Center,
-  Image,
-  Button,
-  ButtonGroup,
-  Heading,
-  Text,
-  AvatarGroup,
-  Avatar,
-  IconButton,
-} from '@chakra-ui/react';
+import { VStack, Heading, Text, AvatarGroup, Avatar } from '@chakra-ui/react';
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 function UserInfo(props) {
+  const { userInfo } = props;
   const params = useParams();
   const { id: userId } = params;
   const { data, error, isLoading } = useSWR(`/api/social/${userId}`, fetcher);
   return (
     <VStack w={'80'} alignItems={'flex-start'}>
       <Heading as="h2" size="xl">
-        {props.userName}
+        {userInfo.name}
       </Heading>
       <Text fontSize="lg">
         {isLoading ? 'loading...' : data ? data.count : 0} bạn bè
@@ -49,4 +33,4 @@ function UserInfo(props) {
   );
 }
 
-export default UserInfo;
+export default memo(UserInfo);

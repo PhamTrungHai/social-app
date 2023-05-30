@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, memo } from 'react';
 import { VStack, Box } from '@chakra-ui/react';
 import TabItems from '../components/TabItems';
 import { FaUserFriends } from 'react-icons/fa';
 
-function NavTab() {
-  const { userInfo } = useSelector((state) => state.user);
+function NavTab(props) {
+  const { userInfo } = props;
   const [userName, setUserName] = useState(userInfo.name);
   const [userImg, setUserImg] = useState(userInfo.avatarURL);
 
@@ -32,4 +31,4 @@ function NavTab() {
   );
 }
 
-export default NavTab;
+export default memo(NavTab);

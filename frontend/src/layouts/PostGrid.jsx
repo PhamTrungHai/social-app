@@ -1,5 +1,4 @@
-import { useState, useLayoutEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useState, useLayoutEffect, memo } from 'react';
 import {
   Box,
   Avatar,
@@ -22,9 +21,9 @@ import TabItems from '../components/TabItems';
 import { MdOutlinePostAdd } from 'react-icons/md';
 import { IoMdImages } from 'react-icons/io';
 
-function PostTab() {
+function PostTab(props) {
   let [value, setValue] = useState('');
-  const { userInfo } = useSelector((state) => state.user);
+  const { userInfo } = props;
   const [userName, setUserName] = useState(userInfo.name);
   const [userImg, setUserImg] = useState(userInfo.avatarURL);
 
@@ -119,4 +118,4 @@ function PostTab() {
   );
 }
 
-export default PostTab;
+export default memo(PostTab);

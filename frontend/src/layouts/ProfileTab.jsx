@@ -117,6 +117,7 @@ function ProfileTab({ socket }) {
       <GridItem bg={'whatsapp.200'}>
         <Grid templateColumns={'1fr'}>
           <UserCover
+            userInfo={userInfo}
             bgURL={curUser.coverURL ? curUser.coverURL.URL : ''}
             bgPosition={curUser.coverURL ? curUser.coverURL.position : 0}
             isSender={curUser.isSender || false}
@@ -132,12 +133,13 @@ function ProfileTab({ socket }) {
                 >
                   <GridItem>
                     <UserAvatar
+                      userInfo={userInfo}
                       picURL={curUser.avatarURL || ''}
                       isSender={curUser.isSender || false}
                     />
                   </GridItem>
                   <GridItem>
-                    <UserInfo userName={curUser.name} />
+                    <UserInfo userInfo={userInfo} userName={curUser.name} />
                   </GridItem>
                   <GridItem>
                     <ButtonGroup

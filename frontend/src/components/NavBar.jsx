@@ -22,13 +22,13 @@ import useSWR from 'swr';
 import { ChatIcon, BellIcon, Search2Icon } from '@chakra-ui/icons';
 import DropMenu from './DropMenu';
 import { useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getTimePassed, getCurrentTime } from '../utils/dateUtil';
 import { getError } from '../utils/getError.js';
 
-const SearchBox = () => {
+const SearchBox = memo(() => {
   return (
     <InputGroup width={300}>
       <IconButton
@@ -39,8 +39,8 @@ const SearchBox = () => {
       <Input type="text" placeholder="Search..." />
     </InputGroup>
   );
-};
-const NotifyBubble = ({ count }) => {
+});
+const NotifyBubble = memo(({ count }) => {
   const display = count > 0 ? 'block' : 'none';
   return (
     <Text
@@ -62,7 +62,7 @@ const NotifyBubble = ({ count }) => {
       {count}
     </Text>
   );
-};
+});
 export default function NavBar({ socket }) {
   const { userInfo } = useSelector((state) => state.user);
   const [notify, setNotify] = useState([]);
@@ -201,7 +201,7 @@ export default function NavBar({ socket }) {
           h="10"
           w="10"
           name="HBook"
-          src="https://res-console.cloudinary.com/dmh5zjb5c/thumbnails/v1/image/upload/v1680598139/bG9nb19kMmRoMWk=/as_is"
+          src="https://res.cloudinary.com/dmh5zjb5c/image/upload/v1680598139/logo_d2dh1i.png"
           marginRight="2"
         />
       </a>
@@ -226,7 +226,7 @@ export default function NavBar({ socket }) {
             <NotifyBubble count={count} />
             <MenuButton
               as={IconButton}
-              aria-label="Setting"
+              aria-label="Notification"
               icon={<BellIcon />}
               variant="outline"
               borderRadius={'full'}

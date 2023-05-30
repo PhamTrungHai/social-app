@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Grid,
@@ -25,8 +25,7 @@ function UserCover(props) {
   const [imgURL, setImgURL] = useState('');
   const [positionY, setPositionY] = useState(0);
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.user);
-  const { lastViewedUser } = useSelector((state) => state.user);
+  const { userInfo } = props;
   const inputRef = useRef();
   const [editing, setEditing] = useState(false);
 
@@ -192,4 +191,4 @@ function UserCover(props) {
   );
 }
 
-export default UserCover;
+export default memo(UserCover);

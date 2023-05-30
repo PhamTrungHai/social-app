@@ -1,4 +1,4 @@
-import { useRef, useState, useLayoutEffect } from 'react';
+import { useRef, useState, useLayoutEffect, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Grid,
@@ -43,7 +43,7 @@ import CarouselTab from '../layouts/CarouselTab';
 
 function UserAvatar(props) {
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.user);
+  const { userInfo } = props;
   const { UPDATE } = useSelector((state) => state.status);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [imgURL, setImgURL] = useState('');
@@ -250,4 +250,4 @@ function UserAvatar(props) {
   );
 }
 
-export default UserAvatar;
+export default memo(UserAvatar);

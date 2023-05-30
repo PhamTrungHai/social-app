@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Menu,
@@ -54,4 +54,4 @@ function DropMenu() {
   );
 }
 
-export default DropMenu;
+export default memo(DropMenu);
