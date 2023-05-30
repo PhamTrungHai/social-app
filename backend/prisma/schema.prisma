@@ -26,6 +26,10 @@ model Friends {
 
 model Users {
   id           String         @id @default("")
+  name         String?
+  email        String?
+  slug         String?
+  profile      Json?          @db.Json
   friendList   FriendList?
   friends      Friends[]
   notification Notification[]

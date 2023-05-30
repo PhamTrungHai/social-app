@@ -39,9 +39,9 @@ function UserInfo(props) {
           ? 'loading...'
           : data.friends.map((friend) => (
               <Avatar
-                key={friend.name}
-                name={friend.name}
-                src={friend.profile.avatarURL}
+                key={friend.users.id}
+                name={friend.users.name}
+                src={friend.users.profile.avatarURL}
               />
             ))}
       </AvatarGroup>

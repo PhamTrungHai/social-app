@@ -1,4 +1,3 @@
-import User from '../models/User.js';
 import expressAsyncHandler from 'express-async-handler';
 import {
   isAuth,
@@ -6,14 +5,15 @@ import {
   generateToken,
 } from '../middlewares/authentication.js';
 import bcrypt from 'bcryptjs';
-import { Models } from '../models/prismaDB.js';
-import { isFriend } from './SocialController.js';
+
+import { isFriend } from '../services/socialService.js';
+import * as userService from '../services/userService.js';
 
 const signIn = expressAsyncHandler(async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+  const user = await userService.getOneUser({ email: req.body.email });
   if (user) {
     if (bcrypt.compareSync(req.body.pswd, user.password)) {
-      res.send({
+      res.send(200).send({
         _id: user.id,
         name: user.name,
         email: user.email,
@@ -29,36 +29,14 @@ const signIn = expressAsyncHandler(async (req, res) => {
 });
 
 const signUp = expressAsyncHandler(async (req, res) => {
-  const string = new String(req.body.email);
-  const slug = string.replace(
-    '.com',
-    string.charCodeAt(string.lastIndexOf('.'))
+  const slug = userService.createUserSlug(req.body.email);
+  const user = await userService.createUser(
+    req.body.name,
+    req.body.email,
+    req.body.pswd,
+    slug
   );
-  const newUser = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.pswd),
-    slug: slug,
-  });
-  const user = await newUser.save();
-  const addUser = async () => {
-    await Models.User.create({
-      data: {
-        id: user.id,
-      },
-    });
-    await Models.FriendList.create({
-      data: {
-        users: {
-          connect: {
-            id: user.id,
-          },
-        },
-      },
-    });
-  };
-  await addUser();
-  res.send({
+  res.status(201).send({
     _id: user.id,
     name: user.name,
     email: user.email,
@@ -68,16 +46,18 @@ const signUp = expressAsyncHandler(async (req, res) => {
     token: generateToken(user),
   });
 });
+
 const editProfile = expressAsyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (user) {
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-    user.slug = req.body.slug || user.slug;
-    user.profile.avatarURL = req.body.avatarURL || user.profile.avatarURL;
-    user.profile.coverURL = req.body.coverURL || user.profile.coverURL;
-    const updatedUser = await user.save();
-    res.send({
+  const updatedUser = await userService.updatedUserInfo(
+    req.params.id,
+    req.body.name,
+    req.body.email,
+    req.body.slug,
+    req.body.avatarURL,
+    req.body.coverURL
+  );
+  if (updatedUser) {
+    res.status(201).send({
       message: 'User Updated',
       user: {
         _id: updatedUser.id,
@@ -94,13 +74,14 @@ const editProfile = expressAsyncHandler(async (req, res) => {
   }
 });
 const getUserByID = expressAsyncHandler(async (req, res) => {
-  const userslug = await User.findOne({ slug: req.params.id });
-  const user = userslug ?? (await User.findById(req.params.id));
+  const userslug = await userService.getOneUser({ slug: req.params.id });
+  const user =
+    userslug ?? (await userService.getOneUser({ id: req.params.id }));
   const checkIsFriend =
     user.id == req.user._id ? 'user' : await isFriend(req.user._id, user.id);
 
   if (user) {
-    res.send({
+    res.status(200).send({
       _id: user.id,
       name: user.name,
       email: user.email,
@@ -114,10 +95,4 @@ const getUserByID = expressAsyncHandler(async (req, res) => {
   }
 });
 
-const findUser = async (id) => {
-  const userslug = await User.findOne({ slug: id });
-  const user = userslug ?? (await User.findById(id));
-  return user ?? null;
-};
-
-export { signIn, signUp, editProfile, getUserByID, findUser };
+export { signIn, signUp, editProfile, getUserByID };
