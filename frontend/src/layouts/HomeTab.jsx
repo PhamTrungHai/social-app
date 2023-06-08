@@ -2,23 +2,49 @@ import React from 'react';
 import NavGrid from './NavGrid';
 import ChatGrid from './ChatGrid';
 import PostGrid from './PostGrid';
-import { Grid, GridItem } from '@chakra-ui/react';
+import { Grid, Box, Flex } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 
 function HomeTab() {
   const { userInfo } = useSelector((state) => state.user);
   return (
-    <Grid templateColumns="repeat(8, 1fr)" gap={4} h="full" marginTop={4}>
-      <GridItem colSpan={2} marginLeft={'2.5'} marginRight={'2.5'}>
+    <Flex gap={4} h="full" m={2} marginTop={4}>
+      <Box
+        width={'20%'}
+        marginLeft={'2.5'}
+        marginRight={'2.5'}
+        sx={{
+          '@media screen and (max-width: 600px)': {
+            display: 'none',
+          },
+        }}
+      >
         <NavGrid userInfo={userInfo} />
-      </GridItem>
-      <GridItem colSpan={4} overflow={'scroll'}>
+      </Box>
+      <Box
+        width={'60%'}
+        overflow={'scroll'}
+        sx={{
+          '@media screen and (max-width: 600px)': {
+            width: '100%',
+          },
+        }}
+      >
         <PostGrid userInfo={userInfo} />
-      </GridItem>
-      <GridItem colSpan={2} marginLeft={'2.5'} marginRight={'2.5'}>
+      </Box>
+      <Box
+        width={'20%'}
+        marginLeft={'2.5'}
+        marginRight={'2.5'}
+        sx={{
+          '@media screen and (max-width: 600px)': {
+            display: 'none',
+          },
+        }}
+      >
         <ChatGrid />
-      </GridItem>
-    </Grid>
+      </Box>
+    </Flex>
   );
 }
 

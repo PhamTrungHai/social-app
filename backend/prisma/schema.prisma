@@ -25,14 +25,19 @@ model Friends {
 }
 
 model Users {
-  id           String         @id @default("")
-  name         String?
-  email        String?
-  slug         String?
-  profile      Json?          @db.Json
-  friendList   FriendList?
-  friends      Friends[]
-  notification Notification[]
+  id                                      String         @id @default("")
+  name                                    String?
+  email                                   String?
+  slug                                    String?
+  profile                                 Json?          @db.Json
+  Comments                                Comments[]
+  friendList                              FriendList?
+  friends                                 Friends[]
+  Likes                                   Likes[]
+  Messages__Messages__recipient_idToUsers Messages_[]    @relation("Messages__recipient_idToUsers")
+  Messages__Messages__sender_idToUsers    Messages_[]    @relation("Messages__sender_idToUsers")
+  notification                            Notification[]
+  Posts                                   Posts[]
 }
 
 model Notification {
@@ -55,4 +60,52 @@ model SessionStore {
   userId    String  @unique
   userName  String
   connected Boolean
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Comments {
+  id             BigInt    @id @default(autoincrement())
+  date_commented DateTime? @default(now()) @db.Timestamptz(6)
+  content        String
+  user_id        String?
+  post_id        BigInt?
+  attachment     String?
+  Posts          Posts?    @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users          Users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Likes {
+  id         BigInt    @id @default(autoincrement())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  user_id    String?
+  post_id    BigInt?
+  Posts      Posts?    @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Users      Users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Messages_ {
+  id                                  BigInt    @id @default(autoincrement())
+  created_at                          DateTime? @default(now()) @db.Timestamptz(6)
+  sender_id                           String?
+  recipient_id                        String?
+  content_                            String    @map("content ")
+  is_read                             Boolean?
+  Users_Messages__recipient_idToUsers Users?    @relation("Messages__recipient_idToUsers", fields: [recipient_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users_Messages__sender_idToUsers    Users?    @relation("Messages__sender_idToUsers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("Messages ")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Posts {
+  id          BigInt     @id @default(autoincrement())
+  date_posted DateTime?  @default(now()) @db.Timestamptz(6)
+  content     String?    @default("")
+  userID      String
+  attachment  String?
+  Comments    Comments[]
+  Likes       Likes[]
+  Users       Users      @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
