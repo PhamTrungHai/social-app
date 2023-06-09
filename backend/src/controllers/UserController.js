@@ -13,7 +13,7 @@ const signIn = expressAsyncHandler(async (req, res) => {
   const user = await userService.getOneUser({ email: req.body.email });
   if (user) {
     if (bcrypt.compareSync(req.body.pswd, user.password)) {
-      res.send(200).send({
+      res.status(200).send({
         _id: user.id,
         name: user.name,
         email: user.email,

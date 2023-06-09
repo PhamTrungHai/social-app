@@ -17,9 +17,10 @@ const getUserNotification = expressAsyncHandler(async (req, res) => {
 const getFriendStatus = expressAsyncHandler(async (req, res) => {
   const user = await userService.getOneUser({ id: req.params.id });
   const listID = await socialService.getFriendListID(user.id);
-  const friendCount = await socialService.getFriendCount(listID);
-  const friends = await socialService.getFriend(listID);
-
+  const [friendCount, friends] = await Promise.all([
+    socialService.getFriendCount(listID),
+    socialService.getFriend(listID),
+  ]);
   res.send({ count: friendCount, friends: friends });
 });
 

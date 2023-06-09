@@ -6,6 +6,7 @@ import './config/index.js';
 import { setHeader } from './middlewares/authentication.js';
 import userRouter from './routes/userRouter.js';
 import uploadRouter from './routes/uploadRouter.js';
+import postRouter from './routes/postRouter.js';
 import socialRouter from './routes/socialRouter.js';
 import registerNotificationHandlers from '../socketio/notificationHandler.js';
 import crypto from 'crypto';
@@ -121,6 +122,7 @@ app.use(express.urlencoded({ extended: true }));
 /*---------------------------------->*/
 app.use('/api/users', userRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/posts', postRouter);
 app.use('/api/social', socialRouter);
 
 //HANDLER ERROR

@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-be": "cd backend && npm start ",
     "dev-fe": "cd frontend && npm run dev",
-    "db-pull": "cd backend && npx prisma db pull"
+    "db-pull": "cd backend && npx prisma db pull",
+    "db-gen": "cd backend && npx prisma generate"
   },
   "author": "",
   "license": "ISC"

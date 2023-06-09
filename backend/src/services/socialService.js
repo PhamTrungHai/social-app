@@ -22,8 +22,11 @@ const getFriendListID = async (userId) => {
 const getFriendCount = async (listID) => {
   const friendCount = await Models.FriendList.findUnique({
     where: { id: listID },
-  }).friends();
-  return friendCount.length;
+    select: {
+      friends: true,
+    },
+  });
+  return friendCount.length || 0;
 };
 
 const getFriend = async (listID) => {

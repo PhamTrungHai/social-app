@@ -7,6 +7,10 @@ const FriendList = prisma.friendList;
 const Friends = prisma.friends;
 const Notification = prisma.notification;
 const SessionStore = prisma.sessionStore;
+const Post = prisma.posts;
+const Comment = prisma.comments;
+const Like = prisma.likes;
+const Message = prisma.messages;
 export const Models = {
   User,
   FriendList,
@@ -14,6 +18,10 @@ export const Models = {
   Notification,
   prisma,
   SessionStore,
+  Post,
+  Comment,
+  Like,
+  Message,
 };
 // function Execute(...funcs) {
 //   for (const func of funcs) {

@@ -13,51 +13,48 @@ import {
   IconButton,
   Image,
 } from '@chakra-ui/react';
-import { BsThreeDotsVertical } from 'react-icons/bs';
-import { BiLike, BiChat, BiShare } from 'react-icons/bi';
+import { BiLike, BiChat, BiShare, BiDotsVertical } from 'react-icons/bi';
 
-function Posts() {
+function Posts({ post }) {
   return (
     <Card marginTop={2}>
       <CardHeader>
         <Flex spacing="4">
           <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-            <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
-
+            <Avatar name={post.Users.name} src={post.Users.profile.avatarURL} />
             <Box>
-              <Heading size="sm">Segun Adebayo</Heading>
-              <Text>Creator, Chakra UI</Text>
+              <Heading size="sm">{post.Users.name}</Heading>
+              <Text fontSize={'small'} fontWeight={'thin'}>
+                {post.date_posted}
+              </Text>
             </Box>
           </Flex>
           <IconButton
             variant="ghost"
             colorScheme="gray"
             aria-label="See menu"
-            icon={<BsThreeDotsVertical />}
+            icon={<BiDotsVertical />}
           />
         </Flex>
       </CardHeader>
       <Image
         objectFit="cover"
-        src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-        alt="Chakra UI"
+        src={post.attachment}
+        alt={`${post.Users.name}'s post`}
       />
       <CardBody>
-        <Text>
-          With Chakra UI, I wanted to sync the speed of development with the
-          speed of design.
-        </Text>
+        <Text>{post.content}</Text>
       </CardBody>
 
-      <CardFooter
-        justify="space-between"
-        flexWrap="wrap"
-        sx={{
-          '& > button': {
-            minW: '136px',
-          },
-        }}
-      >
+      <CardFooter justify="space-between" flexWrap="wrap">
+        <Flex w={'full'} justifyContent={'space-between'}>
+          <Text display={'inline-block'} fontSize={'sm'} fontWeight={'thin'}>
+            {post._count.Likes} likes
+          </Text>
+          <Text display={'inline-block'} fontSize={'sm'} fontWeight={'thin'}>
+            {post._count.Comments} comments
+          </Text>
+        </Flex>
         <Button flex="1" variant="ghost" leftIcon={<BiLike />}>
           Like
         </Button>
@@ -71,4 +68,9 @@ function Posts() {
     </Card>
   );
 }
+
+const PostsList = ({ children }) => {
+  return <Box>{children}</Box>;
+};
 export default Posts;
+export { PostsList };

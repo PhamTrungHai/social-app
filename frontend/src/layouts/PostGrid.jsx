@@ -1,8 +1,7 @@
-import { useState, useLayoutEffect, memo, useRef, useEffect } from 'react';
+import { useState, useLayoutEffect, memo, useRef } from 'react';
 import {
   Box,
   Avatar,
-  Text,
   VStack,
   Button,
   Modal,
@@ -16,23 +15,64 @@ import {
   InputGroup,
   IconButton,
   Image,
-  Icon,
+  SkeletonCircle,
+  SkeletonText,
 } from '@chakra-ui/react';
-import Posts from '../components/Posts';
+import Posts, { PostsList } from '../components/Posts';
 import TabItems from '../components/TabItems';
 import {
   MdOutlinePostAdd,
   MdOutlineClose,
   MdOutlineFace,
+  MdOutlineImage,
 } from 'react-icons/md';
-import { IoMdImages } from 'react-icons/io';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
 import axios from 'axios';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import useSWR from 'swr';
 
 function PostTab(props) {
+  const { userInfo } = props;
+  const [posts, setPosts] = useState([]);
+  const fetcher = (url) =>
+    axios
+      .get(url, {
+        headers: {
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      })
+      .then((res) => res.data)
+      .then((data) => setPosts(data));
+  const { data, error, isLoading } = useSWR(`/api/posts`, fetcher);
+  if (error) toast.error(getError(error));
+
+  return (
+    <VStack spacing={4} align="stretch">
+      <Box
+        bg="whitesmoke"
+        p={4}
+        color="black"
+        display={'flex'}
+        alignItems={'center'}
+        borderRadius="lg"
+      >
+        <UploadModal userInfo={userInfo} />
+      </Box>
+      <PostsList>
+        {isLoading ? (
+          <LoadingBox />
+        ) : (
+          posts.length != 0 &&
+          posts.map((post) => <Posts key={post.date_posted} post={post} />)
+        )}
+      </PostsList>
+    </VStack>
+  );
+}
+
+const UploadModal = memo(function UploadModal(props) {
   const { userInfo } = props;
   const inputRef = useRef();
   let [value, setValue] = useState('');
@@ -74,6 +114,7 @@ function PostTab(props) {
       });
       toast.success('Post created successfully');
       setValue('');
+      images && handleClose();
     } catch (err) {
       toast.error(getError(err));
     }
@@ -117,157 +158,153 @@ function PostTab(props) {
   };
 
   // const handleSelectEmoji = () => {};
-
   return (
-    <VStack spacing={4} align="stretch">
-      <Box
-        bg="whitesmoke"
-        p={4}
-        color="black"
-        display={'flex'}
-        alignItems={'center'}
-        borderRadius="lg"
+    <>
+      <Avatar size="md" name={userInfo.name} src={userInfo.avatarURL} />
+      <Button
+        onClick={onOpen}
+        marginLeft={3}
+        p={1}
+        colorScheme="blackAlpha"
+        width="90%"
+        borderRadius={'2xl'}
+        fontSize={'sm'}
+        sx={{
+          '@media screen and (min-width: 800px)': {
+            fontSize: 'md',
+          },
+        }}
       >
-        <Avatar size="md" name={userInfo.name} src={userInfo.avatarURL} />
-        <Button
-          onClick={onOpen}
-          marginLeft={3}
-          p={1}
-          colorScheme="blackAlpha"
-          width="90%"
-          borderRadius={'2xl'}
-          fontSize={'sm'}
-          sx={{
-            '@media screen and (min-width: 800px)': {
-              fontSize: 'md',
-            },
-          }}
-        >
-          New Post
-        </Button>
-        <Modal size={'md'} onClose={onClose} isOpen={isOpen} isCentered>
-          <ModalOverlay />
-          <ModalContent borderRadius={'2xl'}>
-            <ModalHeader
-              borderBottom={'1px'}
-              textAlign={'center'}
-              as={'b'}
-              fontWeight={'bold'}
-            >
-              Tạo bài viết
-            </ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <TabItems tabName={userInfo.name} tabImage={userInfo.name} />
-              <form onSubmit={handleSubmit}>
+        New Post
+      </Button>
+      <Modal size={'md'} onClose={onClose} isOpen={isOpen} isCentered>
+        <ModalOverlay />
+        <ModalContent borderRadius={'2xl'}>
+          <ModalHeader
+            borderBottom={'1px'}
+            textAlign={'center'}
+            as={'b'}
+            fontWeight={'bold'}
+          >
+            Tạo bài viết
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <TabItems tabName={userInfo.name} tabImage={userInfo.name} />
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
+              <Input
+                marginTop={3}
+                name="content"
+                value={value}
+                as={'textarea'}
+                variant="unstyled"
+                minHeight={'12'}
+                maxHeight={'56'}
+                onChange={handleInputChange}
+                placeholder={`Hi ${userInfo.name}, What are you thinking?`}
+                _placeholder={{ opacity: 1, color: 'gray.500' }}
+                size="md"
+                resize={'none'}
+              />
+              <InputGroup w={'fit-content'} gap={2} position={'relative'}>
                 <Input
-                  marginTop={3}
-                  name="content"
-                  value={value}
-                  as={'textarea'}
-                  variant="unstyled"
-                  minHeight={'12'}
-                  maxHeight={'56'}
-                  onChange={handleInputChange}
-                  placeholder={`Hi ${userInfo.name}, What are you thinking?`}
-                  _placeholder={{ opacity: 1, color: 'gray.500' }}
-                  size="md"
-                  resize={'none'}
+                  // multiple={true}
+                  name="images"
+                  type="file"
+                  id="avatar-pic"
+                  ref={inputRef}
+                  accept="image/*"
+                  hidden
+                  onChange={handleFileChange}
                 />
-                <InputGroup w={'fit-content'} gap={2} position={'relative'}>
-                  <Input
-                    // multiple={true}
-                    name="images"
-                    type="file"
-                    id="avatar-pic"
-                    ref={inputRef}
-                    accept="image/*"
-                    hidden
-                    onChange={handleFileChange}
-                  />
-                  <IconButton
-                    as={IoMdImages}
-                    w={8}
-                    h={8}
-                    color="red.500"
-                    onClick={handleClick}
-                  />
-                  {showEmojiPicker && (
-                    <Box position={'absolute'} top={'100%'}>
-                      <Picker
-                        data={data}
-                        onEmojiSelect={(data, e) => {
-                          setValue(value + data.native);
-                        }}
-                        onClickOutside={console.log}
-                        maxFrequentRows={0}
-                        searchPosition={'none'}
-                        previewPosition={'none'}
-                        perLine={8}
-                      />
-                    </Box>
-                  )}
-                  <IconButton
-                    as={MdOutlineFace}
-                    w={8}
-                    h={8}
-                    color="red.500"
-                    onClick={handleToggleEmojiPicker}
-                  />
-                </InputGroup>
-                {images && (
-                  <Box
-                    display={'flex'}
-                    alignItems="center"
-                    justifyContent="center"
-                    borderRadius={'lg'}
-                    marginY={4}
-                    p={2}
-                    border={'1px'}
-                    position={'relative'}
-                  >
-                    <IconButton
-                      position={'absolute'}
-                      top={2}
-                      right={2}
-                      onClick={handleClose}
-                      icon={<MdOutlineClose />}
-                      borderRadius={'full'}
-                      color={'blackAlpha.900'}
-                      zIndex={1}
-                    />
-                    <Image
-                      src={images}
-                      alt="attachments"
-                      sx={{
-                        aspectRatio: '16/9',
+                <IconButton
+                  as={MdOutlineImage}
+                  w={8}
+                  h={8}
+                  color="red.500"
+                  onClick={handleClick}
+                />
+                {showEmojiPicker && (
+                  <Box position={'absolute'} top={'100%'}>
+                    <Picker
+                      data={data}
+                      onEmojiSelect={(data, e) => {
+                        setValue(value + data.native);
                       }}
-                      objectFit={'contain'}
-                      borderRadius={'md'}
+                      onClickOutside={console.log}
+                      maxFrequentRows={0}
+                      searchPosition={'none'}
+                      previewPosition={'none'}
+                      perLine={8}
                     />
                   </Box>
                 )}
-                <Button
-                  type="submit"
-                  width={'full'}
-                  marginTop={3}
-                  onClick={onClose}
-                  variant="solid"
-                  colorScheme="teal"
-                  leftIcon={<MdOutlinePostAdd />}
+                <IconButton
+                  as={MdOutlineFace}
+                  w={8}
+                  h={8}
+                  color="red.500"
+                  onClick={handleToggleEmojiPicker}
+                />
+              </InputGroup>
+              {images && (
+                <Box
+                  display={'flex'}
+                  alignItems="center"
+                  justifyContent="center"
+                  borderRadius={'lg'}
+                  marginY={4}
+                  p={2}
+                  border={'1px'}
+                  position={'relative'}
                 >
-                  Đăng
-                </Button>
-              </form>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-      </Box>
-      <Box h="40px">
-        <Posts />
-      </Box>
-    </VStack>
+                  <IconButton
+                    position={'absolute'}
+                    top={2}
+                    right={2}
+                    onClick={handleClose}
+                    icon={<MdOutlineClose />}
+                    borderRadius={'full'}
+                    color={'blackAlpha.900'}
+                    zIndex={1}
+                  />
+                  <Image
+                    src={images}
+                    alt="attachments"
+                    sx={{
+                      aspectRatio: '16/9',
+                    }}
+                    objectFit={'contain'}
+                    borderRadius={'md'}
+                  />
+                </Box>
+              )}
+              <Button
+                type="submit"
+                width={'full'}
+                marginTop={3}
+                onClick={onClose}
+                variant="solid"
+                colorScheme="teal"
+                leftIcon={<MdOutlinePostAdd />}
+              >
+                Đăng
+              </Button>
+            </form>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
   );
-}
+});
+
+const LoadingBox = memo(function LoadingBox() {
+  return (
+    <Box padding="6" boxShadow="lg" bg="white" borderRadius={'2xl'}>
+      <SkeletonCircle size="10" />
+      <SkeletonText mt="4" noOfLines={4} spacing="4" skeletonHeight="2" />
+    </Box>
+  );
+});
 
 export default memo(PostTab);

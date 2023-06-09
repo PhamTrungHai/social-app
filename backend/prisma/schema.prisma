@@ -7,86 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model FriendList {
-  id      BigInt    @id @default(autoincrement())
-  userID  String    @unique(map: "FriendList_UserID_key")
-  users   Users     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  friends Friends[]
-}
-
-model Friends {
-  id           BigInt       @id @default(autoincrement())
-  listID       BigInt
-  userID       String
-  status       String
-  friendList   FriendList   @relation(fields: [listID], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  SocialStatus SocialStatus @relation(fields: [status], references: [name], onDelete: Cascade, onUpdate: NoAction)
-  users        Users        @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model Users {
-  id                                      String         @id @default("")
-  name                                    String?
-  email                                   String?
-  slug                                    String?
-  profile                                 Json?          @db.Json
-  Comments                                Comments[]
-  friendList                              FriendList?
-  friends                                 Friends[]
-  Likes                                   Likes[]
-  Messages__Messages__recipient_idToUsers Messages_[]    @relation("Messages__recipient_idToUsers")
-  Messages__Messages__sender_idToUsers    Messages_[]    @relation("Messages__sender_idToUsers")
-  notification                            Notification[]
-  Posts                                   Posts[]
-}
-
-model Notification {
-  id       Int      @id @default(autoincrement())
-  userID   String
-  type     String
-  data     Json     @db.Json
-  date     DateTime @db.Timestamptz(6)
-  isViewed Boolean  @default(false)
-  users    Users    @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model SocialStatus {
-  name    String    @id
-  Friends Friends[]
-}
-
-model SessionStore {
-  sessionID String  @id
-  userId    String  @unique
-  userName  String
-  connected Boolean
-}
-
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Comments {
-  id             BigInt    @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   date_commented DateTime? @default(now()) @db.Timestamptz(6)
   content        String
   user_id        String?
-  post_id        BigInt?
+  post_id        Int?
   attachment     String?
   Posts          Posts?    @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   Users          Users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model FriendList {
+  id      BigInt    @id @default(autoincrement())
+  userID  String    @unique(map: "FriendList_UserID_key")
+  Users   Users     @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Friends Friends[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Friends {
+  id           BigInt       @id @default(autoincrement())
+  listID       BigInt
+  userID       String
+  status       String
+  FriendList   FriendList   @relation(fields: [listID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  SocialStatus SocialStatus @relation(fields: [status], references: [name], onDelete: Cascade, onUpdate: NoAction)
+  Users        Users        @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Likes {
-  id         BigInt    @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   user_id    String?
-  post_id    BigInt?
+  post_id    Int?
   Posts      Posts?    @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   Users      Users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Messages_ {
-  id                                  BigInt    @id @default(autoincrement())
+  id                                  Int       @id @default(autoincrement())
   created_at                          DateTime? @default(now()) @db.Timestamptz(6)
   sender_id                           String?
   recipient_id                        String?
@@ -99,8 +63,19 @@ model Messages_ {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Notification {
+  id       Int      @id @default(autoincrement())
+  userID   String
+  type     String
+  data     Json     @db.Json
+  date     DateTime @db.Timestamptz(6)
+  isViewed Boolean  @default(false)
+  Users    Users    @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Posts {
-  id          BigInt     @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   date_posted DateTime?  @default(now()) @db.Timestamptz(6)
   content     String?    @default("")
   userID      String
@@ -108,4 +83,35 @@ model Posts {
   Comments    Comments[]
   Likes       Likes[]
   Users       Users      @relation(fields: [userID], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model SessionStore {
+  sessionID String  @id
+  userId    String  @unique
+  userName  String
+  connected Boolean
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model SocialStatus {
+  name    String    @id
+  Friends Friends[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Users {
+  id                                      String         @id @default("")
+  name                                    String?
+  email                                   String?
+  slug                                    String?
+  profile                                 Json?          @db.Json
+  Comments                                Comments[]
+  FriendList                              FriendList?
+  Friends                                 Friends[]
+  Likes                                   Likes[]
+  Messages__Messages__recipient_idToUsers Messages_[]    @relation("Messages__recipient_idToUsers")
+  Messages__Messages__sender_idToUsers    Messages_[]    @relation("Messages__sender_idToUsers")
+  Notification                            Notification[]
+  Posts                                   Posts[]
 }
