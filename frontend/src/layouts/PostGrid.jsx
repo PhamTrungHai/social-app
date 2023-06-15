@@ -45,7 +45,9 @@ function PostTab(props) {
       })
       .then((res) => res.data)
       .then((data) => setPosts(data));
-  const { data, error, isLoading } = useSWR(`/api/posts`, fetcher);
+  const { data, error, isLoading } = useSWR(`/api/posts`, fetcher, {
+    revalidateOnFocus: false,
+  });
   if (error) toast.error(getError(error));
 
   return (
@@ -113,7 +115,7 @@ const UploadModal = memo(function UploadModal(props) {
         },
       });
       toast.success('Post created successfully');
-      setValue('');
+      value && setValue('');
       images && handleClose();
     } catch (err) {
       toast.error(getError(err));
@@ -157,7 +159,6 @@ const UploadModal = memo(function UploadModal(props) {
     }
   };
 
-  // const handleSelectEmoji = () => {};
   return (
     <>
       <Avatar size="md" name={userInfo.name} src={userInfo.avatarURL} />

@@ -23,7 +23,7 @@ const getFriendCount = async (listID) => {
   const friendCount = await Models.FriendList.findUnique({
     where: { id: listID },
     select: {
-      friends: true,
+      Friends: true,
     },
   });
   return friendCount.length || 0;
@@ -34,7 +34,7 @@ const getFriend = async (listID) => {
     where: { listID: listID, status: SocialStatus.friend },
     take: 5,
     select: {
-      users: {
+      Users: {
         select: {
           id: true,
           name: true,
@@ -96,7 +96,7 @@ const getAllNotification = async (reqUser) => {
       id: true,
       type: true,
       data: true,
-      users: true,
+      Users: true,
       date: true,
       isViewed: true,
     },
