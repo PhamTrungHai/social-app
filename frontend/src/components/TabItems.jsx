@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import { SettingsIcon } from '@chakra-ui/icons';
 import {
@@ -11,7 +11,7 @@ import {
   Icon,
 } from '@chakra-ui/react';
 
-function TabItems(props) {
+const TabItems = forwardRef(function TabItems(props, ref) {
   return (
     <LinkBox
       as={'button'}
@@ -49,13 +49,12 @@ function TabItems(props) {
       </Box>
     </LinkBox>
   );
-}
+});
 
 TabItems.propTypes = {
   tabImage: PropTypes.string,
   tabName: PropTypes.string,
   tabLink: PropTypes.string,
-  tabIcon: PropTypes.object,
   onClick: PropTypes.func,
 };
 TabItems.defaultProps = {

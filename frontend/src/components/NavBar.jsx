@@ -6,7 +6,6 @@ import {
   Avatar,
   AvatarBadge,
   InputGroup,
-  InputLeftElement,
   Input,
   Menu,
   MenuButton,
@@ -40,6 +39,7 @@ const SearchBox = memo(() => {
     </InputGroup>
   );
 });
+
 const NotifyBubble = memo(({ count }) => {
   const display = count > 0 ? 'block' : 'none';
   return (
@@ -63,7 +63,8 @@ const NotifyBubble = memo(({ count }) => {
     </Text>
   );
 });
-export default function NavBar({ socket }) {
+
+function NavBar({ socket }) {
   const { userInfo } = useSelector((state) => state.user);
   const [notify, setNotify] = useState([]);
   const [newNotify, setNewNotify] = useState([]);
@@ -107,6 +108,7 @@ export default function NavBar({ socket }) {
         return 'đã gửi cho bạn một lời mời kết bạn';
     }
   };
+
   const onReceiveNotify = (user, type, date) => {
     const newType = getNoteType(type);
     const timePassed = getTimePassed(date);
@@ -124,6 +126,7 @@ export default function NavBar({ socket }) {
     ]);
     setCount(count + 1);
   };
+
   useEffect(() => {
     const notifieListener = (notiList) => {
       setNotify([...notiList]);
@@ -170,6 +173,21 @@ export default function NavBar({ socket }) {
       toast.error(err);
     }
   };
+
+  const getNotifyDebounce = debounce((socket) => {
+    socket.emit('notify:read', userInfo._id);
+  });
+
+  function debounce(cb, delay = 2000) {
+    let timeout;
+
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        cb(...args);
+      }, delay);
+    };
+  }
 
   const clearNotify = async () => {
     const notifyIds = data.filter((item) => {
@@ -389,3 +407,5 @@ export default function NavBar({ socket }) {
     </Flex>
   );
 }
+
+export default memo(NavBar);

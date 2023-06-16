@@ -34,7 +34,7 @@ import Picker from '@emoji-mart/react';
 import useSWR from 'swr';
 
 function PostTab(props) {
-  const { userInfo } = props;
+  const { userInfo, socket } = props;
   const [posts, setPosts] = useState([]);
   const fetcher = (url) =>
     axios
@@ -219,7 +219,7 @@ const UploadModal = memo(function UploadModal(props) {
                   onChange={handleFileChange}
                 />
                 <IconButton
-                  as={MdOutlineImage}
+                  icon={<MdOutlineImage size={'24px'} />}
                   w={8}
                   h={8}
                   color="red.500"
@@ -241,7 +241,7 @@ const UploadModal = memo(function UploadModal(props) {
                   </Box>
                 )}
                 <IconButton
-                  as={MdOutlineFace}
+                  icon={<MdOutlineFace size={'24px'} />}
                   w={8}
                   h={8}
                   color="red.500"

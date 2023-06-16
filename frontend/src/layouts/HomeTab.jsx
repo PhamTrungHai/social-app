@@ -5,7 +5,7 @@ import PostGrid from './PostGrid';
 import { Grid, Box, Flex } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 
-function HomeTab() {
+function HomeTab({ socket }) {
   const { userInfo } = useSelector((state) => state.user);
   return (
     <Flex gap={4} h="full" m={2} marginTop={4}>
@@ -30,7 +30,7 @@ function HomeTab() {
           },
         }}
       >
-        <PostGrid userInfo={userInfo} />
+        <PostGrid userInfo={userInfo} socket={socket} />
       </Box>
       <Box
         width={'20%'}

@@ -81,6 +81,7 @@ function Posts({ post }) {
         return state;
     }
   }
+  const [isDisplay, setIsDisplay] = useState(true);
   const { userInfo } = useSelector((state) => state.user);
   const [state, dispatch] = useReducer(reducer, {
     liked: post.Likes[0] ? true : false,
@@ -200,14 +201,23 @@ function Posts({ post }) {
           >
             Like
           </Button>
-          <Button flex="1" variant="ghost" leftIcon={<BiChat />}>
+          <Button
+            flex="1"
+            variant="ghost"
+            onClick={() => setIsDisplay(!isDisplay)}
+            leftIcon={<BiChat />}
+          >
             Comment
           </Button>
           <Button flex="1" variant="ghost" leftIcon={<BiShare />}>
             Share
           </Button>
         </ButtonGroup>
-        <Flex w={'full'} justifyContent={'left'}>
+        <Flex
+          w={'full'}
+          justifyContent={'left'}
+          display={post._count.Comments > 0 && isDisplay ? 'flex' : 'none'}
+        >
           <CommentSection postID={post.id} userInfo={userInfo} />
         </Flex>
       </CardFooter>
@@ -353,7 +363,7 @@ const CommentInput = memo(({ postID }) => {
                 onChange={handleFileChange}
               />
               <IconButton
-                as={BiImage}
+                icon={<BiImage />}
                 w={8}
                 h={8}
                 color="blue.500"
