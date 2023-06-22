@@ -56,12 +56,12 @@ const addToFriendList = async (sendID, receiveID, status) => {
   const listID = await getFriendListID(sendID);
   await Models.Friends.create({
     data: {
-      friendList: {
+      FriendList: {
         connect: {
           id: listID,
         },
       },
-      users: {
+      Users: {
         connect: {
           id: receiveID,
         },
@@ -119,7 +119,7 @@ const createNotification = async (reqUser, recUser, type, payload, date) => {
         payload: payload,
       },
       date: newDate,
-      users: {
+      Users: {
         connect: {
           id: recUser,
         },

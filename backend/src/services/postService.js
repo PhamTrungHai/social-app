@@ -68,7 +68,7 @@ const getAllPosts = async (userId) => {
       },
     },
   });
-  return posts ?? null;
+  return posts;
 };
 
 const createPost = async (userId, content, imageURL) => {

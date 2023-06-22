@@ -92,7 +92,7 @@ const friendRequestHandler = expressAsyncHandler(async (req, res) => {
 });
 
 const requestFriend = expressAsyncHandler(async (req, res) => {
-  const user = await userService.getOneUser(req.params.id);
+  const user = await userService.getOneUser({ id: req.params.id });
   const requestUser = req.body._id;
   const receiveUser = user.id;
   const date = new Date(req.body.date);

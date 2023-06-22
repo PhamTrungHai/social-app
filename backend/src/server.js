@@ -11,8 +11,13 @@ import socialRouter from './routes/socialRouter.js';
 import registerNotificationHandlers from '../socketio/notificationHandler.js';
 import crypto from 'crypto';
 import { Models } from './models/prismaDB.js';
+import cors from 'cors';
 
 dotenv.config();
+
+const corsOptions = {
+  origin: 'http://localhost:5173',
+};
 const randomId = () => crypto.randomBytes(8).toString('hex');
 const SessionStore = Models.SessionStore;
 const app = express();
@@ -57,6 +62,7 @@ io.use(async (socket, next) => {
   socket.userName = username;
   next();
 });
+
 const onConnection = async (socket) => {
   // persist session
   await SessionStore.upsert({
@@ -119,6 +125,7 @@ io.on('connection', onConnection);
 app.use((req, res, next) => setHeader(req, res, next));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
 /*---------------------------------->*/
 app.use('/api/users', userRouter);
 app.use('/api/upload', uploadRouter);
@@ -127,6 +134,7 @@ app.use('/api/social', socialRouter);
 
 //HANDLER ERROR
 app.use((err, req, res, next) => {
+  Models.prisma.$disconnect();
   res.status(500).send({ message: err.message });
 });
 

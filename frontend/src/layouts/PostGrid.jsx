@@ -67,7 +67,9 @@ function PostTab(props) {
           <LoadingBox />
         ) : (
           posts.length != 0 &&
-          posts.map((post) => <Posts key={post.date_posted} post={post} />)
+          posts.map((post) => (
+            <Posts key={post.date_posted} post={post} socket={socket} />
+          ))
         )}
       </PostsList>
     </VStack>

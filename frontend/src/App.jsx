@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import MainPage from './pages/MainPage';
-import LogInPage from './pages/LoginPage';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import './App.css';
 import ProtectedRoute from './auth/ProtectedRoute';
 
 function App() {
+  const MainPage = lazy(() => import('./pages/MainPage'));
+  const LogInPage = lazy(() => import('./pages/LoginPage'));
   return (
     <BrowserRouter>
       <ToastContainer
@@ -29,11 +29,20 @@ function App() {
             path="*"
             element={
               <ProtectedRoute>
-                <MainPage />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <MainPage />
+                </Suspense>
               </ProtectedRoute>
             }
           />
-          <Route path="/login" element={<LogInPage />} />
+          <Route
+            path="/login"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                <LogInPage />
+              </Suspense>
+            }
+          />
         </Routes>
       </div>
     </BrowserRouter>

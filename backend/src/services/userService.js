@@ -8,7 +8,7 @@ const getOneUser = async (queryObj) => {
   } else {
     user = await User.findOne(queryObj);
   }
-  return user ?? null;
+  return user;
 };
 
 const createUserSlug = (email) => {

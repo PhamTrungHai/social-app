@@ -1,0 +1,13 @@
+const notificationType = {
+  FRIEND_REQUESTED: 'FRIEND-REQUESTED',
+  FRIEND_ACCEPTED: 'FRIEND-ACCEPTED',
+  FRIEND_ADDED: 'FRIEND-ADDED',
+  FRIEND_DELETED: 'FRIEND-DELETED',
+  POST_LIKE: 'POST-LIKED',
+  POST_COMMENT: 'POST-COMMENTED',
+  STORY: 'STORY',
+  MESSAGE: 'MESSAGE',
+};
+Object.freeze(notificationType);
+
+export { notificationType };

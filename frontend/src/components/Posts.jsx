@@ -39,8 +39,10 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import useSWR, { useSWRConfig } from 'swr';
+import { notificationType } from '../utils/Enum.js';
+import useNotify from '../hooks/useNotify';
 
-function Posts({ post }) {
+function Posts({ post, socket }) {
   function reducer(state, action) {
     switch (action.type) {
       case 'LIKE':
@@ -81,7 +83,8 @@ function Posts({ post }) {
         return state;
     }
   }
-  const [isDisplay, setIsDisplay] = useState(true);
+
+  const [isDisplay, setIsDisplay] = useState(false);
   const { userInfo } = useSelector((state) => state.user);
   const [state, dispatch] = useReducer(reducer, {
     liked: post.Likes[0] ? true : false,
@@ -89,6 +92,18 @@ function Posts({ post }) {
     likeId: post.Likes[0]?.id,
     btnDisabled: false,
   });
+  const [
+    data,
+    isLoading,
+    newNotify,
+    count,
+    isResponse,
+    debounce,
+    setDebounce,
+    requestHandler,
+    postNotify,
+  ] = useNotify(socket, userInfo);
+
   const handleLike = (postID, likeID) => {
     const handleLikePost = async () => {
       try {
@@ -112,6 +127,7 @@ function Posts({ post }) {
           });
         } else {
           dispatch({ type: 'LIKE' });
+          requestHandler(post.Users.id, '', notificationType.POST_LIKE);
           const { data } = await axios.post(`/api/posts/${postID}/like`, null, {
             headers: {
               authorization: `Bearer ${userInfo.token}`,
@@ -139,6 +155,7 @@ function Posts({ post }) {
     };
     handleLikePost();
   };
+
   return (
     <Card marginTop={2}>
       <CardHeader>
@@ -216,9 +233,13 @@ function Posts({ post }) {
         <Flex
           w={'full'}
           justifyContent={'left'}
-          display={post._count.Comments > 0 && isDisplay ? 'flex' : 'none'}
+          display={isDisplay ? 'flex' : 'none'}
         >
-          <CommentSection postID={post.id} userInfo={userInfo} />
+          {isDisplay ? (
+            <CommentSection postID={post.id} userInfo={userInfo} />
+          ) : (
+            ''
+          )}
         </Flex>
       </CardFooter>
     </Card>
@@ -424,7 +445,7 @@ const CommentsList = ({ children }) => {
   return <Box>{children}</Box>;
 };
 
-const CommentSection = ({ postID, userInfo }) => {
+const CommentSection = memo(({ postID, userInfo }) => {
   const [comments, setComments] = useState([]);
   const fetcher = (url) =>
     axios
@@ -458,7 +479,7 @@ const CommentSection = ({ postID, userInfo }) => {
       </CommentsList>
     </Box>
   );
-};
+});
 
 export default Posts;
 export { PostsList };

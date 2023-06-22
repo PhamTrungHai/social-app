@@ -4,14 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   Grid,
   GridItem,
-  Container,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   Box,
   Center,
-  Image,
   Button,
   ButtonGroup,
 } from '@chakra-ui/react';
@@ -30,17 +28,28 @@ import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { convertTime, getCurrentTime } from '../utils/dateUtil.js';
+import { notificationType } from '../utils/Enum.js';
+import useNotify from '../hooks/useNotify';
 
 function ProfileTab({ socket }) {
   const params = useParams();
   const { id: userId } = params;
+  const { userInfo } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [curUser, setCurUser] = useState({});
   const [isFriend, setIsFriend] = useState('no');
-
-  const { userInfo } = useSelector((state) => state.user);
+  const [
+    notifyData,
+    notifyIsLoading,
+    newNotify,
+    count,
+    isResponse,
+    debounce,
+    setDebounce,
+    requestHandler,
+    postNotify,
+  ] = useNotify(socket, userInfo);
 
   const fetcher = (url, token) => {
     dispatch(statusSlice.actions.FETCH_REQUEST());
@@ -69,19 +78,7 @@ function ProfileTab({ socket }) {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const dateStr = getCurrentTime();
-      const { data } = await axios.post(
-        `/api/social/${userId}`,
-        {
-          _id: userInfo._id,
-          type: 'FRIEND-REQUEST',
-          payload: `${userInfo._id} want to add friend`,
-          date: dateStr,
-        },
-        {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        }
-      );
+      postNotify(userId, notificationType.FRIEND_REQUESTED);
       setIsFriend(data.state);
       toast.success(data.message);
       socket.emit('notify:create', curUser._id, 'FRIEND-REQUESTED', dateStr);
@@ -89,22 +86,10 @@ function ProfileTab({ socket }) {
       toast.error(getError(err));
     }
   };
-  const requestHandler = async (choice, type) => {
+
+  const friendRequestHandler = async (choice, type) => {
     try {
-      const dateStr = getCurrentTime();
-      const { data } = await axios.put(
-        `/api/social/response/${userId}`,
-        {
-          _id: userInfo._id,
-          type: type,
-          payload: `${choice} ${userId} friend request`,
-          reply: choice,
-          date: dateStr,
-        },
-        {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        }
-      );
+      requestHandler(userId, choice, type);
       setIsFriend(data.status);
       toast.success(data.message);
     } catch (err) {
@@ -181,7 +166,10 @@ function ProfileTab({ socket }) {
                           <MenuList>
                             <MenuItem
                               onClick={() =>
-                                requestHandler('cancel', 'FRIEND-DELETED')
+                                friendRequestHandler(
+                                  'cancel',
+                                  notificationType.FRIEND_DELETED
+                                )
                               }
                             >
                               Thu hồi lời mời
@@ -201,14 +189,20 @@ function ProfileTab({ socket }) {
                           <MenuList>
                             <MenuItem
                               onClick={() =>
-                                requestHandler('accept', 'FRIEND-ADDED')
+                                friendRequestHandler(
+                                  'accept',
+                                  notificationType.FRIEND_ACCEPTED
+                                )
                               }
                             >
                               Chấp nhập lời mời kết bạn
                             </MenuItem>
                             <MenuItem
                               onClick={() =>
-                                requestHandler('decline', 'FRIEND-DELETED')
+                                friendRequestHandler(
+                                  'decline',
+                                  notificationType.FRIEND_DECLINED
+                                )
                               }
                             >
                               Hủy
