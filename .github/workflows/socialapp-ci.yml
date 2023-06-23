@@ -12,7 +12,7 @@ permissions:
   id-token: write
   
 jobs:
-  build:
+  frontend:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -22,12 +22,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Install nodejs, npm and yarn
-        run: |
-          echo nodejs version
-          node -v
-          echo npm version
-          npm -v
       - name: Install dependencies
         working-directory: ./frontend
         run: npm install
@@ -35,9 +29,41 @@ jobs:
         working-directory: ./frontend
         run: npm run build
         env: 
-          VITE_API_URL: /
+          VITE_API_URL: ${{ env.VITE_API_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload dist repository
+          name: dist
           path: frontend/dist
+  backend:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm install
+      - name: Build
+        working-directory: ./backend
+        run: npm run build-babel
+        env: 
+          CLIENT_URL: ${{ env.CLIENT_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload build repository
+          name: build
+          path: backend/build
