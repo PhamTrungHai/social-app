@@ -22,8 +22,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      - name: Move to front end dir
-        run: cd frontend
       - name: Install dependencies
         run: npm install
       - name: Build
@@ -37,18 +35,3 @@ jobs:
         with:
           # Upload dist repository
           path: './dist'
-      - name: Move to root
-        run: cd ..
-      - name: Move to backend
-        run: cd backend
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build-babel
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload build repository
-          path: './build'
