@@ -8,15 +8,18 @@ import userRouter from './routes/userRouter.js';
 import uploadRouter from './routes/uploadRouter.js';
 import postRouter from './routes/postRouter.js';
 import socialRouter from './routes/socialRouter.js';
-import registerNotificationHandlers from '../socketio/notificationHandler.js';
+import registerNotificationHandlers from './socketio/notificationHandler.js';
 import crypto from 'crypto';
 import { Models } from './models/prismaDB.js';
 import cors from 'cors';
+import path from 'path';
 
 dotenv.config();
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 const randomId = () => crypto.randomBytes(8).toString('hex');
 const SessionStore = Models.SessionStore;
@@ -24,7 +27,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     medthods: ['GET', 'PUT', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -127,10 +130,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 /*---------------------------------->*/
+//ROUTES
 app.use('/api/users', userRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/posts', postRouter);
 app.use('/api/social', socialRouter);
+/*---------------------------------->*/
+//SERVE STATIC ASSETS IF IN PRODUCTION
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, '/frontend/build')));
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, '/frontend/dist/index.html'))
+);
 
 //HANDLER ERROR
 app.use((err, req, res, next) => {

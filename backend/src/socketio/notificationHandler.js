@@ -1,5 +1,4 @@
-import { Models } from '../src/models/prismaDB.js';
-import User from '../src/models/User.js';
+import User from '../models/User.js';
 
 const getUserInfo = async (userId) => {
   const UserInfo = await User.findById(userId);

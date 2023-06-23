@@ -1,10 +1,9 @@
 import '../styles/LoginPage.css';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Box, Center, Text, VStack } from '@chakra-ui/react';
 import SignIn from '../auth/SignIn';
 import SignUp from '../auth/SignUp';
 import 'animate.css';
-import { animateCSS } from '../utils/animateCss';
 
 function LogInPage() {
   const [slide, setSlide] = useState(false);
@@ -20,6 +19,7 @@ function LogInPage() {
       setSlide(!slide);
     }, 500);
   };
+
   return (
     <VStack>
       <Center w="full" marginTop={10}>

@@ -36,7 +36,7 @@ import {
 import { getTimePassed } from '../utils/dateUtil.js';
 import { getError } from '../utils/getError.js';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { useSelector } from 'react-redux';
 import useSWR, { useSWRConfig } from 'swr';
 import { notificationType } from '../utils/Enum.js';
@@ -110,7 +110,7 @@ function Posts({ post, socket }) {
         if (state.liked) {
           dispatch({ type: 'UNLIKE' });
           const { data } = await axios.delete(
-            `/api/posts/${postID}/unlike/${likeID}`,
+            `api/posts/${postID}/unlike/${likeID}`,
             {
               headers: {
                 authorization: `Bearer ${userInfo.token}`,
@@ -128,7 +128,7 @@ function Posts({ post, socket }) {
         } else {
           dispatch({ type: 'LIKE' });
           requestHandler(post.Users.id, '', notificationType.POST_LIKE);
-          const { data } = await axios.post(`/api/posts/${postID}/like`, null, {
+          const { data } = await axios.post(`api/posts/${postID}/like`, null, {
             headers: {
               authorization: `Bearer ${userInfo.token}`,
             },
@@ -325,7 +325,7 @@ const CommentInput = memo(({ postID }) => {
     const formData = new FormData(form);
     try {
       const { data } = await axios.post(
-        `/api/posts/${postID}/comment`,
+        `api/posts/${postID}/comment`,
         formData,
         {
           headers: {
@@ -337,7 +337,7 @@ const CommentInput = memo(({ postID }) => {
       toast.success('Comment created successfully');
       value && setValue('');
       images && handleClose();
-      mutate(`/api/posts/${postID}/comments`);
+      mutate(`posts/${postID}/comments`);
     } catch (err) {
       toast.error(getError(err));
     }
@@ -457,7 +457,7 @@ const CommentSection = memo(({ postID, userInfo }) => {
       .then((res) => res.data)
       .then((data) => setComments(data));
   const { data, error, isLoading } = useSWR(
-    `/api/posts/${postID}/comments`,
+    `api/posts/${postID}/comments`,
     fetcher,
     {
       revalidateOnFocus: false,

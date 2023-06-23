@@ -17,7 +17,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { statusSlice } from '../slices/statusSlice';
 import { userSlice } from '../slices/userSlice';
 
@@ -44,7 +44,7 @@ function UserCover(props) {
       bodyFormData.append('avatar', file);
       try {
         dispatch(statusSlice.actions.UPDATE_REQUEST());
-        const { data } = await axios.post('/api/upload', bodyFormData, {
+        const { data } = await axios.post(`api/upload`, bodyFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${userInfo.token}`,
@@ -69,7 +69,7 @@ function UserCover(props) {
     e.preventDefault();
     try {
       const { data } = await axios.put(
-        `/api/users/${userInfo._id}`,
+        `api/users/${userInfo._id}`,
         {
           _id: userInfo._id,
           coverURL: { URL: userInfo.coverURL, position: positionY },

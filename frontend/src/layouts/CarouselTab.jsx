@@ -4,7 +4,7 @@ import { Grid, Button, Input, InputGroup } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { statusSlice } from '../slices/statusSlice';
 import Carousel from '../components/Carousel';
 import { userSlice } from '../slices/userSlice';
@@ -34,6 +34,7 @@ function CarouselTab(props) {
   const handleClick = () => {
     inputRef.current?.click();
   };
+
   const handleChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -41,7 +42,7 @@ function CarouselTab(props) {
       bodyFormData.append('avatar', file);
       try {
         dispatch(statusSlice.actions.UPDATE_REQUEST());
-        const { data } = await axios.post('/api/upload', bodyFormData, {
+        const { data } = await axios.post(`api/upload`, bodyFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             authorization: `Bearer ${userInfo.token}`,
@@ -59,6 +60,7 @@ function CarouselTab(props) {
       toast.warning('No image chosen');
     }
   };
+
   return (
     <div>
       <InputGroup onClick={handleClick}>

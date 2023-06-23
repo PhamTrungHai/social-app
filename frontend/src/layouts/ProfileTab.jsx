@@ -26,7 +26,7 @@ import { statusSlice } from '../slices/statusSlice';
 import { userSlice } from '../slices/userSlice';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { useNavigate, useParams } from 'react-router-dom';
 import { notificationType } from '../utils/Enum.js';
 import useNotify from '../hooks/useNotify';
@@ -70,8 +70,9 @@ function ProfileTab({ socket }) {
         toast.error(getError(err));
       });
   };
+
   const { data, error, isLoading } = useSWR(
-    [`/api/users/${userId}`, userInfo.token],
+    [`api/users/${userId}`, userInfo.token],
     ([url, token]) => fetcher(url, token)
   );
 

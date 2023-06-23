@@ -36,7 +36,7 @@ import {
 import { TiCamera } from 'react-icons/ti';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import MessageBox from './MessageBox';
 import { statusSlice } from '../slices/statusSlice';
 import CarouselTab from '../layouts/CarouselTab';
@@ -84,7 +84,7 @@ function UserAvatar(props) {
     e.preventDefault();
     try {
       const { data } = await axios.put(
-        `/api/users/${userInfo._id}`,
+        `api/users/${userInfo._id}`,
         {
           _id: userInfo._id,
           avatarURL: userInfo.avatarURL,

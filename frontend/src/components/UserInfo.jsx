@@ -1,7 +1,7 @@
 import { useState, memo } from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { VStack, Heading, Text, AvatarGroup, Avatar } from '@chakra-ui/react';
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
@@ -9,7 +9,7 @@ function UserInfo(props) {
   const { userInfo } = props;
   const params = useParams();
   const { id: userId } = params;
-  const { data, error, isLoading } = useSWR(`/api/social/${userId}`, fetcher);
+  const { data, error, isLoading } = useSWR(`api/social/${userId}`, fetcher);
   return (
     <VStack w={'80'} alignItems={'flex-start'}>
       <Heading as="h2" size="xl">

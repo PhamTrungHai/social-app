@@ -1,8 +1,1 @@
-FROM node:alpine
-WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
-COPY ./ ./
-RUN npm i
-CMD ["npm", "run", "dev"]
-EXPOSE 5173
+FROM nginx:1.24.0-alpine

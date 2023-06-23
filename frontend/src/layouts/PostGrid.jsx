@@ -28,7 +28,7 @@ import {
 } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import useSWR from 'swr';
@@ -45,7 +45,7 @@ function PostTab(props) {
       })
       .then((res) => res.data)
       .then((data) => setPosts(data));
-  const { data, error, isLoading } = useSWR(`/api/posts`, fetcher, {
+  const { data, error, isLoading } = useSWR(`api/posts`, fetcher, {
     revalidateOnFocus: false,
   });
   if (error) toast.error(getError(error));
@@ -110,7 +110,7 @@ const UploadModal = memo(function UploadModal(props) {
     const form = e.target;
     const formData = new FormData(form);
     try {
-      const { data } = await axios.post('/api/posts', formData, {
+      const { data } = await axios.post(`api/posts`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           authorization: `Bearer ${userInfo.token}`,

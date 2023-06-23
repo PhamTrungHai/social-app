@@ -1,6 +1,6 @@
 import useSWR, { mutate } from 'swr';
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { toast } from 'react-toastify';
 import { getTimePassed, getCurrentTime } from '../utils/dateUtil';
 import { getError } from '../utils/getError.js';
@@ -13,7 +13,7 @@ export default function useNotify(socket, userInfo) {
   const [debounce, setDebounce] = useState(false);
 
   const { data, error, isLoading } = useSWR(
-    `/api/social/notify/${userInfo._id}`,
+    `api/social/notify/${userInfo._id}`,
     (url) => fetcher(url)
   );
 
@@ -57,7 +57,7 @@ export default function useNotify(socket, userInfo) {
     const dateStr = getCurrentTime();
     const { data } = await axios
       .post(
-        `/api/social/${userId}`,
+        `api/social/${userId}`,
         {
           _id: userInfo._id,
           type: type,
@@ -81,7 +81,7 @@ export default function useNotify(socket, userInfo) {
     });
     try {
       const { data } = await axios.patch(
-        `/api/social/notify/${userInfo._id}`,
+        `api/social/notify/${userInfo._id}`,
         {
           notifyArray: notifyIds,
         },
@@ -97,7 +97,7 @@ export default function useNotify(socket, userInfo) {
   };
 
   const refetchNotify = () => {
-    mutate(`/api/social/notify/${userInfo._id}`);
+    mutate(`api/social/notify/${userInfo._id}`);
   };
 
   const getNoteType = useCallback((type) => {
@@ -151,7 +151,7 @@ export default function useNotify(socket, userInfo) {
       const dateStr = getCurrentTime();
       if (choice) {
         const { data } = await axios.put(
-          `/api/social/response/${userId}`,
+          `api/social/response/${userId}`,
           {
             _id: userInfo._id,
             type: type,

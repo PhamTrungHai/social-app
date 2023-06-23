@@ -2,19 +2,19 @@ import { Grid, GridItem, Container, Box, VStack, Flex } from '@chakra-ui/react';
 import NavBar from '../components/NavBar';
 import { Routes, Route } from 'react-router-dom';
 import io from 'socket.io-client';
-import { useState, useEffect } from 'react';
-import HomeTab from '../layouts/HomeTab';
-import ProfileTab from '../layouts/ProfileTab';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import ProtectedRoute from '../auth/ProtectedRoute';
 import { useSelector } from 'react-redux';
 
 function MainPage() {
   const [socket, setSocket] = useState(null);
   const { userInfo } = useSelector((state) => state.user);
+  const HomeTab = lazy(() => import('../layouts/HomeTab'));
+  const ProfileTab = lazy(() => import('../layouts/ProfileTab'));
 
   useEffect(() => {
     const sessionID = localStorage.getItem('sessionID');
-    const newSocket = io(`http://${window.location.hostname}:5000`, {
+    const newSocket = io(import.meta.env.VITE_API_URL, {
       autoConnect: false,
     });
     if (sessionID) {
@@ -50,7 +50,9 @@ function MainPage() {
             path="/"
             element={
               <ProtectedRoute>
-                <HomeTab socket={socket} />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <HomeTab socket={socket} />
+                </Suspense>
               </ProtectedRoute>
             }
           />
@@ -58,7 +60,9 @@ function MainPage() {
             path="/:id"
             element={
               <ProtectedRoute>
-                <ProfileTab socket={socket} />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ProfileTab socket={socket} />
+                </Suspense>
               </ProtectedRoute>
             }
           />

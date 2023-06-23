@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { userSignIn } from '../slices/userSlice';
-
 import { EmailIcon, LockIcon, InfoIcon } from '@chakra-ui/icons';
 import {
   FormControl,
   FormErrorMessage,
   FormHelperText,
   Input,
-  Box,
   Center,
   InputGroup,
   InputLeftElement,
-  Text,
   Button,
-  VStack,
 } from '@chakra-ui/react';
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { toast } from 'react-toastify';
 import { getError } from '../utils/getError';
 
@@ -43,7 +39,7 @@ function SignUp() {
       return;
     }
     try {
-      const { data } = await axios.post('/api/users/signup', {
+      const { data } = await axios.post(`api/users/signup`, {
         name,
         email,
         pswd,
@@ -71,6 +67,7 @@ function SignUp() {
       navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
+
   return (
     <div>
       <form onSubmit={submitHandler}>

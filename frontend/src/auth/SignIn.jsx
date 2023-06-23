@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { userSignIn } from '../slices/userSlice';
-import Axios from 'axios';
+import Axios from '../utils/axios.js';
 import { toast } from 'react-toastify';
 
 import { EmailIcon, LockIcon } from '@chakra-ui/icons';
@@ -11,15 +11,11 @@ import {
   FormErrorMessage,
   FormHelperText,
   Input,
-  Box,
   Center,
   InputGroup,
   InputLeftElement,
-  Text,
   Button,
-  VStack,
 } from '@chakra-ui/react';
-import { getError } from '../utils/getError';
 
 function SignIn() {
   const navigate = useNavigate();
@@ -37,7 +33,7 @@ function SignIn() {
     e.preventDefault();
 
     try {
-      const { data } = await Axios.post('/api/users/signin', {
+      const { data } = await Axios.post(`api/users/signin`, {
         email,
         pswd,
       });
