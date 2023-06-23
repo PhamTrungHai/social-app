@@ -21,8 +21,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: 'npm'
+          node-version: '18.x'
       - name: Move to front end dir
         run: cd frontend
       - name: Install dependencies
