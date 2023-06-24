@@ -12,7 +12,7 @@ permissions:
   id-token: write
   
 jobs:
-  build:
+  frontend:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -22,34 +22,60 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-      - name: Move to front end dir
-        run: cd frontend
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm install
       - name: Build
+        working-directory: ./frontend
         run: npm run build
         env: 
-          VITE_API_URL: /
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Upload artifact
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+      - name: Upload dist
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload dist repository
-          path: './dist'
-      - name: Move to root
-        run: cd ..
-      - name: Move to backend
-        run: cd backend
+          name: dist
+          path: frontend/dist
+      - name: Download dist
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - name: Check file
+        run: ls
+  backend:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
       - name: Install dependencies
+        working-directory: ./backend
         run: npm install
       - name: Build
+        working-directory: ./backend
         run: npm run build-babel
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
+        env: 
+          CLIENT_URL: ${{ env.CLIENT_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload build repository
-          path: './build'
+          name: build
+          path: backend/build
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+      - name: Check file
+        run: ls
