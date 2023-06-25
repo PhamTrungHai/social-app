@@ -78,6 +78,7 @@ jobs:
 #           name: build
   push-api-docker:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -105,6 +106,7 @@ jobs:
           
   push-client-docker:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
