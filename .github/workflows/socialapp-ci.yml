@@ -30,16 +30,17 @@ jobs:
         run: npm run build
         env: 
           VITE_API_URL: ${{ env.VITE_API_URL }}
-      - name: Upload dist
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload dist repository
-          name: dist
-          path: frontend/dist
-      - name: Download dist
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
+#       - name: Upload dist
+#         uses: actions/upload-pages-artifact@v1
+#         with:
+#           # Upload dist repository
+#           name: dist
+#           path: frontend/dist
+#       - name: Download dist
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: dist
+
   backend:
     runs-on: ubuntu-latest
     environment: production
@@ -65,30 +66,66 @@ jobs:
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload build repository
-          name: build
-          path: backend/build
-      - name: Download build
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-  docker:
+#       - name: Upload artifact
+#         uses: actions/upload-pages-artifact@v1
+#         with:
+#           # Upload build repository
+#           name: build
+#           path: backend/build
+#       - name: Download build
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: build
+  push-api-docker:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v3
-        - uses: isbang/compose-action@v1.4.1
-          with:
-            compose-file: "./production/docker-compose.yml"
-            down-flags: "--volumes"
-            env: |
-              CLIENT_URL: ${{ env.CLIENT_URL }}
-              JWT_SECRET: ${{ secrets.JWT_SECRET }}
-              MONGODB_URI: ${{ secrets.MONGODB_URI }}
-              CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-              CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-              CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-              DIRECT_URL: ${{ secrets.DIRECT_URL }}
-              DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/hbook-api
+      
+      - name: Build and push backend Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          
+  push-client-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/hbook-api
+      
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
