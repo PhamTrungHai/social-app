@@ -40,8 +40,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dist
-      - name: Check file
-        run: ls
   backend:
     runs-on: ubuntu-latest
     environment: production
@@ -77,5 +75,20 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-      - name: Check file
-        run: ls
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+        - uses: isbang/compose-action@v1.4.1
+          with:
+            compose-file: "./production/docker-compose.yml"
+            down-flags: "--volumes"
+            env: |
+              CLIENT_URL: ${{ env.CLIENT_URL }}
+              JWT_SECRET: ${{ secrets.JWT_SECRET }}
+              MONGODB_URI: ${{ secrets.MONGODB_URI }}
+              CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+              CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+              CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+              DIRECT_URL: ${{ secrets.DIRECT_URL }}
+              DATABASE_URL: ${{ secrets.DATABASE_URL }}
