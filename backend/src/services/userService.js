@@ -4,12 +4,16 @@ import bcrypt from 'bcryptjs';
 
 const getOneUser = async (queryObj) => {
   var user;
-  if (Object.hasOwn(queryObj, 'id')) {
-    user = await User.findById(queryObj.id);
-  } else {
-    user = await User.findOne(queryObj);
+  try {
+    if (Object.hasOwn(queryObj, 'id')) {
+      user = await User.findById(queryObj.id);
+    } else {
+      user = await User.findOne(queryObj);
+    }
+    return user;
+  } catch (error) {
+    throw new Error('User not found');
   }
-  return user;
 };
 
 const createUserSlug = (email) => {
