@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { Models } from '../models/prismaDB.js';
+import bcrypt from 'bcryptjs';
 
 const getOneUser = async (queryObj) => {
   var user;
