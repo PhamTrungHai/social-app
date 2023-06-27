@@ -37,7 +37,7 @@ const createUser = async (name, email, password, slug) => {
     });
     await Models.FriendList.create({
       data: {
-        users: {
+        Users: {
           connect: {
             id: user.id,
           },
