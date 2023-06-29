@@ -16,6 +16,7 @@ import {
   InputLeftElement,
   Button,
 } from '@chakra-ui/react';
+import { getError } from '../utils/getError';
 
 function SignIn() {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ function SignIn() {
       localStorage.setItem('userInfo', JSON.stringify(data));
       navigate(redirect || '/');
     } catch (err) {
-      toast.error(err, {
+      toast.error(getError(err), {
         position: 'top-center',
         autoClose: 4000,
         hideProgressBar: false,
