@@ -53,7 +53,7 @@ function ProfileTab({ socket }) {
 
   const fetcher = (url, token) => {
     dispatch(statusSlice.actions.FETCH_REQUEST());
-    axios
+    return axios
       .get(url, {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -73,7 +73,10 @@ function ProfileTab({ socket }) {
 
   const { data, error, isLoading } = useSWR(
     [`api/users/${userId}`, userInfo.token],
-    ([url, token]) => fetcher(url, token)
+    ([url, token]) => fetcher(url, token),
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   const submitHandler = async (e) => {

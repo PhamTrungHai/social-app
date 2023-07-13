@@ -2,18 +2,12 @@ import User from '../models/User.js';
 import { Models } from '../models/prismaDB.js';
 import bcrypt from 'bcryptjs';
 
-const getOneUser = async (queryObj) => {
-  var user;
-  try {
-    if (Object.hasOwn(queryObj, 'id')) {
-      user = await User.findById(queryObj.id);
-    } else {
-      user = await User.findOne(queryObj);
-    }
-    return user;
-  } catch (error) {
-    throw new Error('User not found');
-  }
+const getUserByID = async (id) => {
+  return await User.findById(id);
+};
+
+const getUserByQuery = async (queryObj) => {
+  return await User.findOne(queryObj);
 };
 
 const createUserSlug = (email) => {
@@ -54,7 +48,7 @@ const createUser = async (name, email, password, slug) => {
 };
 
 const updatedUserInfo = async (id, name, email, slug, avatarURL, coverURL) => {
-  const user = await getOneUser({ id: id });
+  const user = await getUserByID(id);
   if (user) {
     user.name = name || user.name;
     user.email = email || user.email;
@@ -66,4 +60,10 @@ const updatedUserInfo = async (id, name, email, slug, avatarURL, coverURL) => {
   } else return null;
 };
 
-export { getOneUser, createUserSlug, createUser, updatedUserInfo };
+export {
+  getUserByID,
+  getUserByQuery,
+  createUserSlug,
+  createUser,
+  updatedUserInfo,
+};

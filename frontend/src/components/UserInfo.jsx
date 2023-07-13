@@ -9,7 +9,9 @@ function UserInfo(props) {
   const { userInfo } = props;
   const params = useParams();
   const { id: userId } = params;
-  const { data, error, isLoading } = useSWR(`api/social/${userId}`, fetcher);
+  const { data, error, isLoading } = useSWR(`api/social/${userId}`, fetcher, {
+    revalidateOnFocus: false,
+  });
   return (
     <VStack w={'80'} alignItems={'flex-start'}>
       <Heading as="h2" size="xl">

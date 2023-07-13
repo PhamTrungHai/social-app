@@ -14,7 +14,10 @@ export default function useNotify(socket, userInfo) {
 
   const { data, error, isLoading } = useSWR(
     `api/social/notify/${userInfo._id}`,
-    (url) => fetcher(url)
+    (url) => fetcher(url),
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   const fetcher = useCallback(

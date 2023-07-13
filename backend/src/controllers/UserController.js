@@ -10,7 +10,7 @@ import { isFriend } from '../services/socialService.js';
 import * as userService from '../services/userService.js';
 
 const signIn = expressAsyncHandler(async (req, res) => {
-  const user = await userService.getOneUser({ email: req.body.email });
+  const user = await userService.getUserByQuery({ email: req.body.email });
   if (user) {
     if (bcrypt.compareSync(req.body.pswd, user.password)) {
       res.status(200).send({
@@ -73,10 +73,10 @@ const editProfile = expressAsyncHandler(async (req, res) => {
     res.status(404).send({ message: 'User Not Found' });
   }
 });
+
 const getUserByID = expressAsyncHandler(async (req, res) => {
-  const userslug = await userService.getOneUser({ slug: req.params.id });
-  const user =
-    userslug ?? (await userService.getOneUser({ id: req.params.id }));
+  const userBySlug = await userService.getUserByQuery({ slug: req.params.id });
+  const user = userBySlug ?? (await userService.getUserByID(req.params.id));
   const checkIsFriend =
     user.id == req.user._id ? 'user' : await isFriend(req.user._id, user.id);
 

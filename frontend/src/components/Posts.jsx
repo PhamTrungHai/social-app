@@ -109,7 +109,7 @@ function Posts({ post, socket }) {
       try {
         if (state.liked) {
           dispatch({ type: 'UNLIKE' });
-          const { data } = await axios.delete(
+          var { data } = await axios.delete(
             `api/posts/${postID}/unlike/${likeID}`,
             {
               headers: {
@@ -117,31 +117,23 @@ function Posts({ post, socket }) {
               },
             }
           );
-          dispatch({
-            type: 'SUCCESS',
-            payload: {
-              likeId: data.like ? data.like.id : null,
-              likes: data?.postStat.Likes,
-              btnDisabled: false,
-            },
-          });
         } else {
           dispatch({ type: 'LIKE' });
-          requestHandler(post.Users.id, '', notificationType.POST_LIKE);
-          const { data } = await axios.post(`api/posts/${postID}/like`, null, {
+          var { data } = await axios.post(`api/posts/${postID}/like`, null, {
             headers: {
               authorization: `Bearer ${userInfo.token}`,
             },
           });
-          dispatch({
-            type: 'SUCCESS',
-            payload: {
-              likeId: data?.like.id,
-              likes: data?.postStat.Likes,
-              btnDisabled: false,
-            },
-          });
+          await requestHandler(post.Users.id, '', notificationType.POST_LIKE);
         }
+        dispatch({
+          type: 'SUCCESS',
+          payload: {
+            likeId: data.like ? data.like.id : null,
+            likes: data?.postStat.Likes,
+            btnDisabled: false,
+          },
+        });
       } catch (error) {
         dispatch({
           type: 'FAIL',
