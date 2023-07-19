@@ -6,6 +6,11 @@ const getUserByID = async (id) => {
   return await User.findById(id);
 };
 
+const getUserID = async (slug) => {
+  const user = await User.findOne({ slug: slug });
+  return user.id;
+};
+
 const getUserByQuery = async (queryObj) => {
   return await User.findOne(queryObj);
 };
@@ -66,4 +71,5 @@ export {
   createUserSlug,
   createUser,
   updatedUserInfo,
+  getUserID,
 };

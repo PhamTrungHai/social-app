@@ -1,6 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  errorFormat: 'minimal',
+  log: [
+    {
+      emit: 'event',
+      level: 'query',
+    },
+  ],
+});
+prisma.$on('query', (e) => {
+  console.log('Query: ' + e.query);
+  console.log('Params: ' + e.params);
+  console.log('Duration: ' + e.duration + 'ms');
+});
 
 const User = prisma.users;
 const FriendList = prisma.friendList;

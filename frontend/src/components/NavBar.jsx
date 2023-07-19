@@ -73,6 +73,7 @@ function NavBar({ socket }) {
     setDebounce,
     requestHandler,
     postNotify,
+    getNoteType,
   ] = useNotify(socket, userInfo);
 
   return (

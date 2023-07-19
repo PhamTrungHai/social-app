@@ -82,18 +82,21 @@ function ProfileTab({ socket }) {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      postNotify(userId, notificationType.FRIEND_REQUESTED);
-      setIsFriend(data.state);
+      const { data, dateStr } = await postNotify(
+        curUser._id,
+        notificationType.FRIEND_REQUESTED
+      );
       toast.success(data.message);
       socket.emit('notify:create', curUser._id, 'FRIEND-REQUESTED', dateStr);
+      setIsFriend(data.state);
     } catch (err) {
-      toast.error(getError(err));
+      toast.error(`${this}` + getError(err));
     }
   };
 
   const friendRequestHandler = async (choice, type) => {
     try {
-      requestHandler(userId, choice, type);
+      const data = await requestHandler(userId, choice, type);
       setIsFriend(data.status);
       toast.success(data.message);
     } catch (err) {

@@ -15,16 +15,21 @@ const getFriendCount = async (listID) => {
   const friendCount = await Models.FriendList.findUnique({
     where: { id: listID },
     select: {
-      Friends: true,
+      Friends: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
-  return friendCount.length || 0;
+  console.log(friendCount);
+  return friendCount.Friends.length || 0;
 };
 
-const getFriend = async (listID) => {
+const getFriendByAmount = async (listID, amount) => {
   const friends = Models.Friends.findMany({
     where: { listID: listID, status: SocialStatus.friend },
-    take: 5,
+    take: amount,
     select: {
       Users: {
         select: {
@@ -39,7 +44,10 @@ const getFriend = async (listID) => {
 };
 
 const getFriendStatus = async (listID) => {
-  return await Promise.all([getFriendCount(listID), getFriend(listID)]);
+  return await Promise.all([
+    getFriendCount(listID),
+    getFriendByAmount(listID, 5),
+  ]);
 };
 
 const isFriend = async (userId, friendId) => {
@@ -50,9 +58,10 @@ const isFriend = async (userId, friendId) => {
 };
 
 const addToFriendList = async (sendID, receiveID) => {
-  const [senderList, receiveList] = await Promise.all[
-    (getFriendListID(sendID), getFriendListID(receiveID))
-  ];
+  const [senderList, receiveList] = await Promise.all([
+    getFriendListID(sendID),
+    getFriendListID(receiveID),
+  ]);
   await Promise.all([
     Models.Friends.create({
       data: {
@@ -97,9 +106,10 @@ const addToFriendList = async (sendID, receiveID) => {
 };
 
 const changeFriendStatus = async (sendID, receiveID) => {
-  const [senderList, receiveList] = await Promise.all[
-    (getFriendListID(sendID), getFriendListID(receiveID))
-  ];
+  const [senderList, receiveList] = await Promise.all([
+    getFriendListID(sendID),
+    getFriendListID(receiveID),
+  ]);
   const [sender, receiver] = await Promise.all([
     Models.prisma
       .$queryRaw`UPDATE "Friends" SET "status"=${SocialStatus.friend} WHERE "listID" = ${senderList} AND "userID"=${receiveID} RETURNING *;`,
@@ -123,6 +133,6 @@ export {
   changeFriendStatus,
   deleteFriendStatus,
   getFriendCount,
-  getFriend,
+  getFriendByAmount,
   getFriendStatus,
 };

@@ -87,7 +87,7 @@ const getUserByID = expressAsyncHandler(async (req, res) => {
       email: user.email,
       slug: user.slug || user.id,
       avatarURL: user.profile.avatarURL,
-      coverURL: user.profile.coverURL,
+      coverURL: JSON.stringify(user.profile.coverURL),
       status: checkIsFriend,
     });
   } else {

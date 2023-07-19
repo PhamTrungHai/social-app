@@ -72,8 +72,10 @@ export default function useNotify(socket, userInfo) {
         }
       )
       .catch((err) => {
-        toast.error(getError(err));
+        toast.error(this.name + getError(err));
+        return;
       });
+    return { data, dateStr };
   };
 
   const clearNotify = async () => {
@@ -120,26 +122,23 @@ export default function useNotify(socket, userInfo) {
     }
   });
 
-  const onReceiveNotify = useCallback(
-    (user, type, date) => {
-      const newType = getNoteType(type);
-      const timePassed = getTimePassed(date);
-      setNewNotify([
-        {
-          userId: user?.id,
-          data: {
-            sender: { name: user?.name, avatar: user?.avatar },
-            payload: `${user?.name} ${newType}`,
-          },
-          time: timePassed,
-          type: type,
+  const onReceiveNotify = (user, type, date) => {
+    const newType = getNoteType(type);
+    const timePassed = getTimePassed(date);
+    setNewNotify([
+      {
+        userId: user?.id,
+        data: {
+          sender: { name: user?.name, avatar: user?.avatar },
+          payload: `${user?.name} ${newType}`,
         },
-        ...newNotify,
-      ]);
-      setCount(count + 1);
-    },
-    [newNotify, count]
-  );
+        time: timePassed,
+        type: type,
+      },
+      ...newNotify,
+    ]);
+    setCount(count + 1);
+  };
 
   useEffect(() => {
     socket.on('notify:receive', onReceiveNotify);
@@ -172,7 +171,9 @@ export default function useNotify(socket, userInfo) {
       toast.success(data.message);
     } catch (err) {
       toast.error(err);
+      return;
     }
+    return data;
   };
 
   return [
@@ -185,5 +186,6 @@ export default function useNotify(socket, userInfo) {
     setDebounce,
     requestHandler,
     postNotify,
+    getNoteType,
   ];
 }

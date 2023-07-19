@@ -3,6 +3,8 @@ import * as socialService from '../services/socialService.js';
 import * as notificationService from '../services/notificationService.js';
 import expressAsyncHandler from 'express-async-handler';
 import { SocialStatus, notificationType } from '../utils/Enum.js';
+import perfy from 'perfy';
+import { isValidObjectId } from 'mongoose';
 
 const getUserNotification = expressAsyncHandler(async (req, res) => {
   const notiList = await notificationService.getAllNotification(req.params.id);
@@ -10,10 +12,15 @@ const getUserNotification = expressAsyncHandler(async (req, res) => {
 });
 
 const getFriendStatus = expressAsyncHandler(async (req, res) => {
-  const userBySlug = await userService.getUserByQuery({ slug: req.params.id });
-  const user = userBySlug ?? (await userService.getUserByID(req.params.id));
-  const listID = await socialService.getFriendListID(user.id);
+  perfy.start('transaction');
+  let id = req.params.id;
+  !isValidObjectId(id)
+    ? (id = await userService.getUserID(id))
+    : console.log('id', id);
+  const listID = await socialService.getFriendListID(id);
   const [friendCount, friends] = await socialService.getFriendStatus(listID);
+  let resp = perfy.end('transaction');
+  console.log(`ended in ${resp.fullMilliseconds} ms`);
   res.send({ count: friendCount, friends: friends });
 });
 
