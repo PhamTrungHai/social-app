@@ -3,7 +3,6 @@ import * as socialService from '../services/socialService.js';
 import * as notificationService from '../services/notificationService.js';
 import expressAsyncHandler from 'express-async-handler';
 import { SocialStatus, notificationType } from '../utils/Enum.js';
-import perfy from 'perfy';
 import { isValidObjectId } from 'mongoose';
 
 const getUserNotification = expressAsyncHandler(async (req, res) => {
@@ -12,30 +11,27 @@ const getUserNotification = expressAsyncHandler(async (req, res) => {
 });
 
 const getFriendStatus = expressAsyncHandler(async (req, res) => {
-  perfy.start('transaction');
   let id = req.params.id;
   !isValidObjectId(id)
     ? (id = await userService.getUserID(id))
     : console.log('id', id);
   const listID = await socialService.getFriendListID(id);
   const [friendCount, friends] = await socialService.getFriendStatus(listID);
-  let resp = perfy.end('transaction');
-  console.log(`ended in ${resp.fullMilliseconds} ms`);
   res.send({ count: friendCount, friends: friends });
 });
 
 const friendRequestHandler = expressAsyncHandler(async (req, res) => {
-  const user = await userService.getUserByID(req.params.id);
+  const userID = await userService.getUserID(req.params.id);
   const responseUser = req.body._id;
   const date = req.body.date;
-  const receiveUser = user.id;
+  const receiveUser = userID;
   const reply = req.body.reply;
   let friendStatus;
   let msg;
   let type = req.body.type;
   const flag = await socialService.isFriend(receiveUser, responseUser);
 
-  if (user) {
+  if (userID) {
     switch (reply) {
       case 'accept':
         if (flag == SocialStatus.requesting) {
@@ -89,12 +85,12 @@ const friendRequestHandler = expressAsyncHandler(async (req, res) => {
 });
 
 const requestFriend = expressAsyncHandler(async (req, res) => {
-  const user = await userService.getUserByID(req.params.id);
+  const userID = await userService.getUserID(req.params.id);
   const requestUser = req.body._id;
-  const receiveUser = user.id;
+  const receiveUser = userID;
   const date = new Date(req.body.date);
 
-  if (user) {
+  if (userID) {
     await socialService.addToFriendList(requestUser, receiveUser);
     await notificationService.createNotification(
       requestUser,
